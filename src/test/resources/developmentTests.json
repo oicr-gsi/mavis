@@ -1,0 +1,40 @@
+{
+  "defaults": {
+    "description": "Bcl2Barcode workflow test",
+    "metrics_calculate": "calculate.sh",
+    "metrics_compare": "compare.sh",
+    "output_metrics_dir": "/.mounts/labs/PDE/data/RegressionTests/Bcl2Barcode/workflow/development/output_expectation/"
+  },
+  "tests": [
+    {
+      "id": "150928_SN346_0594_AHCTWGBCXX",
+      "parameters": {
+        "wdl_inputs": {
+          "bcl2barcode.runDirectory": "/.mounts/labs/PDE/data/testdata/runs/basespace/HiSeq/150928_SN346_0594_AHCTWGBCXX",
+          "bcl2barcode.lanes": [1, 2],
+          "bcl2barcode.basesMask": "y1n*,i*,n*"
+        }
+      }
+    },     {
+      "id": "OverrideBcl2fastqPath",
+      "parameters": {
+        "wdl_inputs": {
+          "bcl2barcode.runDirectory": "/.mounts/labs/PDE/data/testdata/runs/basespace/HiSeq/150928_SN346_0594_AHCTWGBCXX",
+          "bcl2barcode.lanes": [1, 2],
+          "bcl2barcode.basesMask": "y1n*,i*,n*",
+          "bcl2barcode.generateIndexFastqs.bcl2fastq": "/.mounts/labs/PDE/modulator/sw/Ubuntu18.04/bcl2fastq-2.20.0.422/bin/bcl2fastq"
+        }
+      }
+    },{
+      "id": "OverrideBcl2fastqModule",
+      "parameters": {
+        "wdl_inputs": {
+          "bcl2barcode.runDirectory": "/.mounts/labs/PDE/data/testdata/runs/basespace/HiSeq/150928_SN346_0594_AHCTWGBCXX",
+          "bcl2barcode.lanes": [1, 2],
+          "bcl2barcode.basesMask": "y1n*,i*,n*",
+          "bcl2barcode.generateIndexFastqs.modules": "bcl2fastq/2.18.0.12"
+        }
+      }
+    }
+  ]
+}
