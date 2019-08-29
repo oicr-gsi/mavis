@@ -25,7 +25,7 @@ input {
  	File   inputBAMidx
 	File   STARFusion
         Int?   jobMemory = 10
-        File?  referenceGenome = "/.mounts/labs/gsiprojects/gsi/reference/mavis/hg19/hg19_random.fa"
+        File?  referenceGenome = "/scratch2/groups/gsi/development/modulator_hg19/resit/modulator/sw/data/hg19-p13/hg19_random.fa"
         File?  annotations = "/.mounts/labs/gsiprojects/gsi/reference/mavis/hg19/ensembl69_hg19_annotations_with_ncrna.json"
         File?  masking = "/.mounts/labs/gsiprojects/gsi/reference/mavis/hg19/hg19_masking.tab"
         File?  dvgAnnotations = "/.mounts/labs/gsiprojects/gsi/reference/mavis/hg19/dgv_hg19_variants.tab"
