@@ -48,10 +48,12 @@ input {
         String? mavisUninformativeFilter = "True"
         String? modules = "mavis/2.2.6"
         Int?   jobMemory = 12
-        Int?   sleepInterval = 10
+        Int?   sleepInterval = 20
 }
 
 command <<<
+ unset LD_LIBRARY_PATH
+ unset LD_LIBRARY_PATH_modshare
  export MAVIS_REFERENCE_GENOME=~{referenceGenome}
  export MAVIS_ANNOTATIONS=~{annotations}
  export MAVIS_MASKING=~{masking}
