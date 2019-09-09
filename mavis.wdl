@@ -3,15 +3,15 @@ version 1.0
 workflow MavisWorkflow {
 input {
  	String projectID
-	String outputDIR
-	String outputCONFIG
-        String? mavisModule = "mavis/2.2.6"
+	String? outputDIR= "."
+	String? outputCONFIG = "mavis_config.cfg"
+        String? mavisModule  = "mavis/2.2.6"
 	File inputBAM
 	File inputBAMindex
-	File STARFusion
+	File fusionData
 }
 
-call runMavis { input: outputDIR = outputDIR, outputCONFIG = outputCONFIG, projectID = projectID, STARFusion = STARFusion, inputBAM = inputBAM, inputBAMidx = inputBAMindex, modules = mavisModule }
+call runMavis { input: outputDIR = outputDIR, outputCONFIG = outputCONFIG, projectID = projectID, fusionData = fusionData, inputBAM = inputBAM, inputBAMidx = inputBAMindex, modules = mavisModule }
 
 output {
   File resultTable    = runMavis.mavis_results
@@ -26,9 +26,9 @@ task runMavis {
 input {
  	File   inputBAM
  	File   inputBAMidx
-	File   STARFusion
-        String outputDIR
-        String outputCONFIG
+	File   fusionData
+        String? outputDIR
+        String? outputCONFIG
         String projectID
         File?  referenceGenome = "/scratch2/groups/gsi/development/modulator_hg19/resit/modulator/sw/data/hg19-p13/hg19_random.fa"
         File?  annotations = "/.mounts/labs/gsiprojects/gsi/reference/mavis/hg19/ensembl69_hg19_annotations_with_ncrna.json"
@@ -63,7 +63,7 @@ command <<<
  mavis config --write "~{outputDIR}~{outputCONFIG}" \
               --assign ~{projectID} starfusion starfusion \
               --library ~{projectID} transcriptome diseased True ~{inputBAM} \
-              --convert starfusion ~{STARFusion} starfusion
+              --convert starfusion ~{fusionData} starfusion
  export MAVIS_ALIGNER='~{mavisAligner}'
  export MAVIS_SCHEDULER=~{mavisScheduler}
  export MAVIS_DRAW_FUSIONS_ONLY=~{mavisDrawFusionOnly}
