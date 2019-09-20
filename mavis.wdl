@@ -3,15 +3,14 @@ version 1.0
 workflow MavisWorkflow {
 input {
  	String projectID
-	String? outputDIR= "."
 	String? outputCONFIG = "mavis_config.cfg"
-        String? mavisModule  = "mavis/2.2.6"
+        String? mavisModules = "mavis/2.2.6 hg19-mavis/2.2.6 hg19/p13"
 	File inputBAM
 	File inputBAMindex
 	File fusionData
 }
 
-call runMavis { input: outputDIR = outputDIR, outputCONFIG = outputCONFIG, projectID = projectID, fusionData = fusionData, inputBAM = inputBAM, inputBAMidx = inputBAMindex, modules = mavisModule }
+call runMavis { input: outputCONFIG = outputCONFIG, projectID = projectID, fusionData = fusionData, inputBAM = inputBAM, inputBAMidx = inputBAMindex, modules = mavisModules }
 
 output {
   File resultTable    = runMavis.mavis_results
@@ -27,15 +26,14 @@ input {
  	File   inputBAM
  	File   inputBAMidx
 	File   fusionData
-        String? outputDIR
         String? outputCONFIG
         String projectID
-        File?  referenceGenome = "/scratch2/groups/gsi/development/modulator_hg19/resit/modulator/sw/data/hg19-p13/hg19_random.fa"
-        File?  annotations = "/.mounts/labs/gsiprojects/gsi/reference/mavis/hg19/ensembl69_hg19_annotations_with_ncrna.json"
-        File?  masking = "/.mounts/labs/gsiprojects/gsi/reference/mavis/hg19/hg19_masking.tab"
-        File?  dvgAnnotations = "/.mounts/labs/gsiprojects/gsi/reference/mavis/hg19/dgv_hg19_variants.tab"
-        File?  alignerReference = "/.mounts/labs/gsiprojects/gsi/reference/mavis/hg19/hg19.2bit"
-        File?  templateMetadata = "/.mounts/labs/gsiprojects/gsi/reference/mavis/hg19/cytoBand.txt"
+        String?  referenceGenome = "$HG19_ROOT/hg19_random.fa"
+        String?  annotations = "$HG19_MAVIS_ROOT/ensembl69_hg19_annotations.json"
+        String?  masking = "$HG19_MAVIS_ROOT/hg19_masking.tab"
+        String?  dvgAnnotations = "$HG19_MAVIS_ROOT/dgv_hg19_variants.tab"
+        String?  alignerReference = "$HG19_MAVIS_ROOT/hg19.2bit"
+        String?  templateMetadata = "$HG19_MAVIS_ROOT/cytoBand.txt"
         String? mavisAligner = "blat"
         String? mavisScheduler = "SGE"
         String? mavisDrawFusionOnly = "False"
@@ -46,7 +44,7 @@ input {
         Int? minClusterPerFile = 5
         String? drawNonSynonymousCdnaOnly = "False"
         String? mavisUninformativeFilter = "True"
-        String? modules = "mavis/2.2.6"
+        String? modules = "mavis/2.2.6 hg19-mavis/2.2.6 hg19/p13"
         Int?   jobMemory = 12
         Int?   sleepInterval = 20
 }
@@ -60,7 +58,7 @@ command <<<
  export MAVIS_DGV_ANNOTATION=~{dvgAnnotations}
  export MAVIS_ALIGNER_REFERENCE=~{alignerReference}
  export MAVIS_TEMPLATE_METADATA=~{templateMetadata}
- mavis config --write "~{outputDIR}~{outputCONFIG}" \
+ mavis config --write ~{outputCONFIG} \
               --assign ~{projectID} starfusion starfusion \
               --library ~{projectID} transcriptome diseased True ~{inputBAM} \
               --convert starfusion ~{fusionData} starfusion
@@ -74,9 +72,9 @@ command <<<
  export DRAW_NON_SYNONYMOUS_CDNA_ONLY=~{drawNonSynonymousCdnaOnly}
  export min_clusters_per_file=~{minClusterPerFile}
  export MAVIS_UNINFORMATIVE_FILTER=~{mavisUninformativeFilter}
- mavis setup "~{outputDIR}~{outputCONFIG}" -o ~{outputDIR}
- BATCHID=$(grep MS_batch ~{outputDIR}/build.cfg | grep -v \] | sed s/.*-// | tail -n 1)
- mavis schedule -o ~{outputDIR} --submit 2> >(tee launch_stderr.log)
+ mavis setup ~{outputCONFIG} -o .
+ BATCHID=$(grep MS_batch build.cfg | grep -v \] | sed s/.*-// | tail -n 1)
+ mavis schedule -o . --submit 2> >(tee launch_stderr.log)
  sleep ~{sleepInterval}
  LASTJOB=$(cat launch_stderr.log | grep SUBMITTED | tail -n 1 | sed s/.*\(//)
  num='([0-9^]+)'
@@ -85,9 +83,9 @@ command <<<
     while qstat | grep $jobID; do
         sleep 5
     done
-    if [ -f ~{outputDIR}/summary/MAVIS-$jobID.COMPLETE ]; then
-        zip -qj $BATCHID"_drawings.zip" ~{outputDIR}/~{projectID}\_diseased_transcriptome/annotate/*/drawings/*svg \
-                                        ~{outputDIR}/~{projectID}\_diseased_transcriptome/annotate/*/drawings/*json
+    if [ -f summary/MAVIS-$jobID.COMPLETE ]; then
+        zip -qj $BATCHID"_drawings.zip" ~{projectID}\_diseased_transcriptome/annotate/*/drawings/*svg \
+                                        ~{projectID}\_diseased_transcriptome/annotate/*/drawings/*json
         exit 0
     fi
     echo "MAVIS job finished but THERE ARE NO RESULTS"
@@ -104,7 +102,7 @@ runtime {
 
 output {
   Array[File?] zipped_drawings = glob('*.zip')
-  File mavis_results   = "${outputDIR}/summary/mavis_summary_all_${projectID}.tab"
+  File mavis_results   = "summary/mavis_summary_all_${projectID}.tab"
 }
 }
 
