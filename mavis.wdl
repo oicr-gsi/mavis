@@ -1,6 +1,6 @@
 version 1.0
 
-workflow MavisWorkflow {
+workflow mavis {
 input {
  	String projectID
 	String? outputCONFIG = "mavis_config.cfg"
