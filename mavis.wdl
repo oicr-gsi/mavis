@@ -29,7 +29,7 @@ input {
         String? outputCONFIG
         String projectID
         String?  referenceGenome = "$HG19_ROOT/hg19_random.fa"
-        String?  annotations = "$HG19_MAVIS_ROOT/ensembl69_hg19_annotations.json"
+        String?  annotations = "$HG19_MAVIS_ROOT/ensembl69_hg19_annotations_with_ncrna.json"
         String?  masking = "$HG19_MAVIS_ROOT/hg19_masking.tab"
         String?  dvgAnnotations = "$HG19_MAVIS_ROOT/dgv_hg19_variants.tab"
         String?  alignerReference = "$HG19_MAVIS_ROOT/hg19.2bit"
