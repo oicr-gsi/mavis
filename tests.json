@@ -16,11 +16,12 @@
       "id": "EPT0068_CHR11_DOWNSAMPLED",
       "parameters": {
         "wdl_inputs": {
-          "mavis.fusionData": "/.mounts/labs/PDE/data/RegressionTests/MAVIS/workflow/development/input_data/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.star-fusion.fusion_predictions.abridged_chr11.tsv",
-          "mavis.inputBAM": "/.mounts/labs/PDE/data/RegressionTests/MAVIS/workflow/development/input_data/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.Aligned.sortedByCoord.out_chr11.bam",
-          "mavis.inputBAMindex": "/.mounts/labs/PDE/data/RegressionTests/MAVIS/workflow/development/input_data/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.Aligned.sortedByCoord.out_chr11.bam.bai",
-          "mavis.projectID": "TGL24",
-          "mavis.outputCONFIG": "mavis_config.cfg"
+          "mavis.svData": ["/.mounts/labs/PDE/data/RegressionTests/MAVIS/workflow/development/input_data/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.star-fusion.fusion_predictions.abridged_chr11.tsv"],
+          "mavis.inputBAMs": ["/.mounts/labs/PDE/data/RegressionTests/MAVIS/workflow/development/input_data/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.Aligned.sortedByCoord.out_chr11.bam"],
+          "mavis.inputBAMidx": ["/.mounts/labs/PDE/data/RegressionTests/MAVIS/workflow/development/input_data/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.Aligned.sortedByCoord.out_chr11.bam.bai"],
+          "mavis.libTypes": ["WT"],
+          "mavis.svWorkflows": ["StarFusion"],
+          "mavis.donor": "EPT0068"
         }
       }
     }

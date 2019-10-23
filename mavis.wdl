@@ -2,18 +2,18 @@ version 1.0
 
 workflow mavis {
 input {
- 	String projectID
-	String? outputCONFIG = "mavis_config.cfg"
-        String? mavisModules = "mavis/2.2.6 hg19-mavis/2.2.6 hg19/p13"
-	File inputBAM
-	File inputBAMindex
-	File fusionData
+ 	String donor
+        Array[File]   inputBAMs
+        Array[File]   inputBAMidx
+        Array[File]   svData
+        Array[String] libTypes
+        Array[String] svWorkflows
 }
 
-call runMavis { input: outputCONFIG = outputCONFIG, projectID = projectID, fusionData = fusionData, inputBAM = inputBAM, inputBAMidx = inputBAMindex, modules = mavisModules }
+call runMavis { input: donor = donor, svData = svData, inputBAMs = inputBAMs, inputBAMidx = inputBAMidx, libTypes = libTypes, svWorkflows = svWorkflows }
 
 output {
-  File resultTable    = runMavis.mavis_results
+  File zippedSummaryTable = select_first(runMavis.zipped_summaries)
   File zippedDrawings = select_first(runMavis.zipped_drawings)
 }
 }
@@ -23,11 +23,14 @@ output {
 # ===================================
 task runMavis {
 input {
- 	File   inputBAM
- 	File   inputBAMidx
-	File   fusionData
-        String? outputCONFIG
-        String projectID
+ 	Array[File]   inputBAMs
+ 	Array[File]   inputBAMidx
+	Array[File]   svData
+        Array[String] libTypes
+        Array[String] svWorkflows
+        String? outputCONFIG = "mavis_config.cfg"
+        String? scriptName = "mavis_config.sh"
+        String donor
         String?  referenceGenome = "$HG19_ROOT/hg19_random.fa"
         String?  annotations = "$HG19_MAVIS_ROOT/ensembl69_hg19_annotations_with_ncrna.json"
         String?  masking = "$HG19_MAVIS_ROOT/hg19_masking.tab"
@@ -58,10 +61,57 @@ command <<<
  export MAVIS_DGV_ANNOTATION=~{dvgAnnotations}
  export MAVIS_ALIGNER_REFERENCE=~{alignerReference}
  export MAVIS_TEMPLATE_METADATA=~{templateMetadata}
- mavis config --write ~{outputCONFIG} \
-              --assign ~{projectID} starfusion starfusion \
-              --library ~{projectID} transcriptome diseased True ~{inputBAM} \
-              --convert starfusion ~{fusionData} starfusion
+ python <<CODE
+
+ libtypes = {'WT': "transcriptome", 'MR': "transcriptome", 'WG': "genome"}
+ wfMappings = {'StructuralVariation': 'delly', 'Delly': 'delly', 'StarFusion': 'starfusion', 'Manta': 'manta'}
+ svMappings = {'delly': ["WG"], 'starfusion': ["WT","MR"], 'manta': ['WG']}
+
+ b = "~{sep=' ' inputBAMs}"
+ bams = b.split()
+ l = "~{sep=' ' libTypes}"
+ libs = l.split()
+ s = "~{sep=' ' svData}"
+ svdata = s.split()
+ w = "~{sep=' ' svWorkflows}"
+ wfs = w.split()
+
+ library_lines = []
+ convert_lines = []
+ assign_lines = []
+ assign_arrays = {}
+ for lt in libtypes.keys():
+   assign_arrays[lt] = []
+
+ for b in range(len(bams)):
+   flag = ('False' if libs[b] == 'WG' else 'True')
+   library_lines.append( "--library " + libs[b] + ".~{donor} " + libtypes[libs[b]] + " diseased " + flag + " " + bams[b] + " \\\\" )
+
+
+ for s in range(len(svdata)):
+   for w in wfMappings.keys():
+       if w in wfs[s]:
+           convert_lines.append( "--convert " + wfMappings[w] + " " + svdata[s] + " " + wfMappings[w] + " \\\\" )
+           for library_type in svMappings[wfMappings[w]]:
+              assign_arrays[library_type].append(wfMappings[w])
+
+ for b in range(len(bams)):
+     if len(assign_arrays[libs[b]]) > 0:
+         separator = " "
+         tools = separator.join(assign_arrays[libs[b]])
+         assign_lines.append( "--assign " + libs[b] + ".~{donor} " + tools + " \\\\" )
+
+ f = open("~{scriptName}","w+")
+ f.write("#!/bin/bash" + "\n\n")
+ f.write('mavis config \\\\\n')
+ f.write('\n'.join(library_lines) + '\n')
+ f.write('\n'.join(convert_lines) + '\n')
+ f.write('\n'.join(assign_lines) + '\n')
+ f.write("--write ~{outputCONFIG}\n")
+ f.close()
+ CODE
+ chmod +x ~{scriptName}
+ ./~{scriptName}
  export MAVIS_ALIGNER='~{mavisAligner}'
  export MAVIS_SCHEDULER=~{mavisScheduler}
  export MAVIS_DRAW_FUSIONS_ONLY=~{mavisDrawFusionOnly}
@@ -84,8 +134,9 @@ command <<<
         sleep 5
     done
     if [ -f summary/MAVIS-$jobID.COMPLETE ]; then
-        zip -qj $BATCHID"_drawings.zip" ~{projectID}\_diseased_transcriptome/annotate/*/drawings/*svg \
-                                        ~{projectID}\_diseased_transcriptome/annotate/*/drawings/*json
+        zip -qj $BATCHID"_drawings.zip" *~{donor}\_diseased_*/annotate/*/drawings/*svg \
+                                        *~{donor}\_diseased_*/annotate/*/drawings/*json
+        zip -qj $BATCHID"_summary.zip" summary/mavis_summary_all_*~{donor}.tab
         exit 0
     fi
     echo "MAVIS job finished but THERE ARE NO RESULTS"
@@ -101,8 +152,8 @@ runtime {
 }
 
 output {
-  Array[File?] zipped_drawings = glob('*.zip')
-  File mavis_results   = "summary/mavis_summary_all_${projectID}.tab"
+  Array[File?] zipped_drawings  = glob('*drawings.zip')
+  Array[File?] zipped_summaries = glob('*summary.zip')
 }
 }
 
