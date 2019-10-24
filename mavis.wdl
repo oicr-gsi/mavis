@@ -12,6 +12,12 @@ input {
 
 call runMavis { input: donor = donor, svData = svData, inputBAMs = inputBAMs, inputBAMidx = inputBAMidx, libTypes = libTypes, svWorkflows = svWorkflows }
 
+meta {
+ author: "Peter Ruzanov"
+ email: "peter.ruzanov@oicr.on.ca"
+ description: "mavis 1.0"
+}
+
 output {
   File zippedSummaryTable = select_first(runMavis.zipped_summaries)
   File zippedDrawings = select_first(runMavis.zipped_drawings)
@@ -51,6 +57,37 @@ input {
         Int?   jobMemory = 12
         Int?   sleepInterval = 20
 }
+
+parameter_meta {
+ inputBAMs: "array of input bam files"
+ inputBAMidx: "array of input .bai files"
+ svData: "array of SV calls"
+ libTypes: "List of library types, metadata for inputBAMs"
+ svWorkflows: "List of SV callers, metadata for svData"
+ outputCONFIG: "name of config file for MAVIS"
+ scriptName: "name for bash script to run mavis configuration, default mavis_config.sh"
+ donor: "donor id, i.e. PCSI_0001 Identifies a patient, cell culture grown at certain condition etc."
+ referenceGenome: "path to fasta file with genomic assembly"
+ annotations: ".json file with annotations for MAVIS"
+ masking: "masking data in .tab format"
+ dvgAnnotations: "The DGV annotations help to deal with variants found in normal tissue"
+ alignerReference: "References in 2bit (compressed) format, used by MAVIS aligner"
+ templateMetadata: "Chromosome Band Information, used for visualization"
+ mavisAligner: "blat by default, may be customized"
+ mavisScheduler: "Our cluster environment, sge, SLURM etc. "
+ mavisDrawFusionOnly: "flag for MAVIS visualization control"
+ mavisAnnotationMemory: "Memory allocated for annotation step"
+ mavisValidationMemory: "Memory allocated for validation step"
+ mavisTransValidationMemory: "Memory allocated for transvalidation step"
+ mavisMemoryLimit: "Max Memory allocated for MAVIS"
+ minClusterPerFile: "Determines the way parallel calculations are organized "
+ drawNonSynonymousCdnaOnly: "flag for MAVIS visualization control"
+ mavisUninformativeFilter: "Should be enabled if used is only interested in events inside genes, speeds up calculations"
+ modules: "modules needed to run MAVIS"
+ jobMemory: "Memory allocated for this job"
+ sleepInterval: "A pause after scheduling step, in seconds"
+}
+
 
 command <<<
  unset LD_LIBRARY_PATH
