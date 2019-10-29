@@ -3,14 +3,28 @@ version 1.0
 workflow mavis {
 input {
  	String donor
-        Array[File]   inputBAMs
+        Array[Pair[String, File]] inputBAMs
+        Array[Pair[Pair[String, String],File]] svData
         Array[File]   inputBAMidx
-        Array[File]   svData
-        Array[String] libTypes
-        Array[String] svWorkflows
 }
 
-call runMavis { input: donor = donor, svData = svData, inputBAMs = inputBAMs, inputBAMidx = inputBAMidx, libTypes = libTypes, svWorkflows = svWorkflows }
+scatter (i in range(length(inputBAMs))) {
+    Int idx = i
+    call massageBamData{input: in = inputBAMs[idx]}
+}
+Array[File] bamFiles = massageBamData.bam
+Array[String] libTypes = massageBamData.libType
+
+scatter (j in range(length(svData))) {
+    Int jdx = j
+    call massageSvData{input: inMetaData = svData[jdx].left, inFile = svData[jdx].right}
+}
+
+Array[File] svFiles       = massageSvData.svFile
+Array[String] svWorkflows  = massageSvData.svWorkflow
+Array[String] svLibDesigns = massageSvData.libDesign
+
+call runMavis { input: donor = donor, svData = svFiles, inputBAMs = bamFiles, inputBAMidx = inputBAMidx, libTypes = libTypes, svWorkflows = svWorkflows, svLibDesigns = svLibDesigns }
 
 meta {
  author: "Peter Ruzanov"
@@ -25,15 +39,56 @@ output {
 }
 
 # ===================================
+#   MASSAGE alignment data
+# ===================================
+task massageBamData{
+input{
+  Pair[String, File] in
+}
+
+command <<<
+ echo "Processing pair ~{in.left} and  ~{basename(in.right)}"
+>>>
+
+output{
+ String libType = "~{in.left}"
+ File bam = in.right
+}
+}
+
+# ===================================
+#   MASSAGE SV data
+# ===================================
+task massageSvData{
+input{
+  Pair[String, String] inMetaData
+  File inFile
+}
+
+command <<<
+ echo "Processing pair ~{inMetaData.left} and  ~{inMetaData.right}"
+ echo "Have file ~{basename(inFile)}"
+>>>
+
+output{
+ String svWorkflow = "~{inMetaData.left}"
+ String libDesign  = "~{inMetaData.right}"
+ File svFile = inFile
+}
+}
+
+
+# ===================================
 #  CONFIGURE, SETUP and LAUNCH
 # ===================================
 task runMavis {
 input {
- 	Array[File]   inputBAMs
- 	Array[File]   inputBAMidx
-	Array[File]   svData
+        Array[File]   inputBAMs
+        Array[File]   inputBAMidx
+        Array[File]   svData
         Array[String] libTypes
         Array[String] svWorkflows
+        Array[String] svLibDesigns
         String? outputCONFIG = "mavis_config.cfg"
         String? scriptName = "mavis_config.sh"
         String donor
@@ -64,6 +119,7 @@ parameter_meta {
  svData: "array of SV calls"
  libTypes: "List of library types, metadata for inputBAMs"
  svWorkflows: "List of SV callers, metadata for svData"
+ svLibDesigns: "List of library designs to accompany the list of SV calls"
  outputCONFIG: "name of config file for MAVIS"
  scriptName: "name for bash script to run mavis configuration, default mavis_config.sh"
  donor: "donor id, i.e. PCSI_0001 Identifies a patient, cell culture grown at certain condition etc."
@@ -102,7 +158,6 @@ command <<<
 
  libtypes = {'WT': "transcriptome", 'MR': "transcriptome", 'WG': "genome"}
  wfMappings = {'StructuralVariation': 'delly', 'Delly': 'delly', 'StarFusion': 'starfusion', 'Manta': 'manta'}
- svMappings = {'delly': ["WG"], 'starfusion': ["WT","MR"], 'manta': ['WG']}
 
  b = "~{sep=' ' inputBAMs}"
  bams = b.split()
@@ -112,6 +167,8 @@ command <<<
  svdata = s.split()
  w = "~{sep=' ' svWorkflows}"
  wfs = w.split()
+ sl = "~{sep=' ' svLibDesigns}"
+ svlibs = sl.split()
 
  library_lines = []
  convert_lines = []
@@ -129,8 +186,7 @@ command <<<
    for w in wfMappings.keys():
        if w in wfs[s]:
            convert_lines.append( "--convert " + wfMappings[w] + " " + svdata[s] + " " + wfMappings[w] + " \\\\" )
-           for library_type in svMappings[wfMappings[w]]:
-              assign_arrays[library_type].append(wfMappings[w])
+           assign_arrays[svlibs[s]].append(wfMappings[w])
 
  for b in range(len(bams)):
      if len(assign_arrays[libs[b]]) > 0:

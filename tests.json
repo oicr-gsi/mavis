@@ -16,11 +16,9 @@
       "id": "EPT0068_CHR11_DOWNSAMPLED",
       "parameters": {
         "wdl_inputs": {
-          "mavis.svData": ["/.mounts/labs/gsi/testdata/mavis/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.star-fusion.fusion_predictions.abridged_chr11.tsv"],
-          "mavis.inputBAMs": ["/.mounts/labs/gsi/testdata/mavis/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.Aligned.sortedByCoord.out_chr11.bam"],
+          "mavis.svData": [{"Left": {"Left": "StarFusion", "Right" : "WT"}, "Right": "/.mounts/labs/gsi/testdata/mavis/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.star-fusion.fusion_predictions.abridged_chr11.tsv"}],
+          "mavis.inputBAMs": [{"Left": "WT","Right": "/.mounts/labs/gsi/testdata/mavis/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.Aligned.sortedByCoord.out_chr11.bam"}],
           "mavis.inputBAMidx": ["/.mounts/labs/gsi/testdata/mavis/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.Aligned.sortedByCoord.out_chr11.bam.bai"],
-          "mavis.libTypes": ["WT"],
-          "mavis.svWorkflows": ["StarFusion"],
           "mavis.donor": "EPT0068"
         }
       }
