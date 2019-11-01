@@ -46,6 +46,10 @@ input{
   Pair[String, File] in
 }
 
+parameter_meta {
+ in: "paired library design and the corresponding bam file"
+}
+
 command <<<
  echo "Processing pair ~{in.left} and  ~{basename(in.right)}"
 >>>
@@ -63,6 +67,11 @@ task massageSvData{
 input{
   Pair[String, String] inMetaData
   File inFile
+}
+
+parameter_meta {
+ inMetaData: "paired library design and workflow name for SV data file"
+ inFile: "SV data file"
 }
 
 command <<<
