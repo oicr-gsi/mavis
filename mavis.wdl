@@ -24,7 +24,9 @@ Array[File] svFiles       = massageSvData.svFile
 Array[String] svWorkflows  = massageSvData.svWorkflow
 Array[String] svLibDesigns = massageSvData.libDesign
 
-call runMavis { input: donor = donor, svData = svFiles, inputBAMs = bamFiles, inputBAMidx = inputBAMidx, libTypes = libTypes, svWorkflows = svWorkflows, svLibDesigns = svLibDesigns }
+String sanitized_donor = sub(donor, "_", ".")
+
+call runMavis { input: donor = sanitized_donor, svData = svFiles, inputBAMs = bamFiles, inputBAMidx = inputBAMidx, libTypes = libTypes, svWorkflows = svWorkflows, svLibDesigns = svLibDesigns }
 
 meta {
  author: "Peter Ruzanov"
@@ -46,14 +48,14 @@ input{
   Pair[String, File] in
 }
 
-parameter_meta {
- in: "paired library design and the corresponding bam file"
-}
-
 command <<<
  echo "Processing pair ~{in.left} and  ~{basename(in.right)}"
 >>>
 
+parameter_meta {
+  in: "paired library design and the corresponding bam file"
+}
+ 
 output{
  String libType = "~{in.left}"
  File bam = in.right
@@ -69,15 +71,16 @@ input{
   File inFile
 }
 
+command <<<
+ echo "Processing pair ~{inMetaData.left} and  ~{inMetaData.right}"
+ echo "Have file ~{basename(inFile)}"
+>>>
+
 parameter_meta {
  inMetaData: "paired library design and workflow name for SV data file"
  inFile: "SV data file"
 }
 
-command <<<
- echo "Processing pair ~{inMetaData.left} and  ~{inMetaData.right}"
- echo "Have file ~{basename(inFile)}"
->>>
 
 output{
  String svWorkflow = "~{inMetaData.left}"
@@ -166,7 +169,7 @@ command <<<
  python <<CODE
 
  libtypes = {'WT': "transcriptome", 'MR': "transcriptome", 'WG': "genome"}
- wfMappings = {'StructuralVariation': 'delly', 'Delly': 'delly', 'StarFusion': 'starfusion', 'Manta': 'manta'}
+ wfMappings = {'StructuralVariation': 'delly', 'delly': 'delly', 'StarFusion': 'starfusion', 'manta': 'manta'}
 
  b = "~{sep=' ' inputBAMs}"
  bams = b.split()
