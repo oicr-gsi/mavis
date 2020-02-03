@@ -35,8 +35,8 @@ meta {
 }
 
 output {
-  File zippedSummaryTable = select_first(runMavis.zipped_summaries)
-  File zippedDrawings = select_first(runMavis.zipped_drawings)
+  File? zippedSummaryTable = if length(runMavis.zipped_summaries) > 0 then select_first(runMavis.zipped_summaries) else 'null'
+  File? zippedDrawings     = if length(runMavis.zipped_drawings)  > 0 then select_first(runMavis.zipped_drawings)  else 'null'
 }
 }
 
