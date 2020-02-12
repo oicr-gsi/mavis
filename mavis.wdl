@@ -15,7 +15,6 @@ scatter(b in inputBAMs) {
   String bamLibraryDesigns = b.libraryDesign
 }
 
-
 scatter(s in svData) {
   File svFiles = s.svFile
   String workflowNames = s.workflowName
@@ -36,7 +35,7 @@ call runMavis {
 meta {
  author: "Peter Ruzanov"
  email: "peter.ruzanov@oicr.on.ca"
- description: "mavis 1.0"
+ description: "Workflow to annotate structural variants."
 }
 
 output {
