@@ -3,30 +3,35 @@ version 1.0
 workflow mavis {
 input {
  	String donor
-        Array[Pair[String, File]] inputBAMs
-        Array[Pair[Pair[String, String],File]] svData
-        Array[File]   inputBAMidx
+  Array[BamData] inputBAMs
+  Array[SvData] svData
 }
-
-scatter (i in range(length(inputBAMs))) {
-    Int idx = i
-    call massageBamData{input: in = inputBAMs[idx]}
-}
-Array[File] bamFiles = massageBamData.bam
-Array[String] libTypes = massageBamData.libType
-
-scatter (j in range(length(svData))) {
-    Int jdx = j
-    call massageSvData{input: inMetaData = svData[jdx].left, inFile = svData[jdx].right}
-}
-
-Array[File] svFiles       = massageSvData.svFile
-Array[String] svWorkflows  = massageSvData.svWorkflow
-Array[String] svLibDesigns = massageSvData.libDesign
 
 String sanitized_donor = sub(donor, "_", ".")
 
-call runMavis { input: donor = sanitized_donor, svData = svFiles, inputBAMs = bamFiles, inputBAMidx = inputBAMidx, libTypes = libTypes, svWorkflows = svWorkflows, svLibDesigns = svLibDesigns }
+scatter(b in inputBAMs) {
+  File bams = b.bam
+  File bamIndexes = b.bamIndex
+  String bamLibraryDesigns = b.libraryDesign
+}
+
+
+scatter(s in svData) {
+  File svFiles = s.svFile
+  String workflowNames = s.workflowName
+  String svLibraryDesigns = s.libraryDesign
+}
+
+call runMavis {
+  input:
+    donor = sanitized_donor,
+    inputBAMs = bams,
+    inputBAMidx = bamIndexes,
+    libTypes = bamLibraryDesigns,
+    svData = svFiles,
+    svWorkflows = workflowNames,
+    svLibDesigns = svLibraryDesigns
+}
 
 meta {
  author: "Peter Ruzanov"
@@ -39,56 +44,6 @@ output {
   File? zippedDrawings     = if length(runMavis.zipped_drawings)  > 0 then select_first(runMavis.zipped_drawings)  else 'null'
 }
 }
-
-# ===================================
-#   MASSAGE alignment data
-# ===================================
-task massageBamData{
-input{
-  Pair[String, File] in
-}
-
-command <<<
- echo "Processing pair ~{in.left} and  ~{basename(in.right)}"
->>>
-
-parameter_meta {
-  in: "paired library design and the corresponding bam file"
-}
- 
-output{
- String libType = "~{in.left}"
- File bam = in.right
-}
-}
-
-# ===================================
-#   MASSAGE SV data
-# ===================================
-task massageSvData{
-input{
-  Pair[String, String] inMetaData
-  File inFile
-}
-
-command <<<
- echo "Processing pair ~{inMetaData.left} and  ~{inMetaData.right}"
- echo "Have file ~{basename(inFile)}"
->>>
-
-parameter_meta {
- inMetaData: "paired library design and workflow name for SV data file"
- inFile: "SV data file"
-}
-
-
-output{
- String svWorkflow = "~{inMetaData.left}"
- String libDesign  = "~{inMetaData.right}"
- File svFile = inFile
-}
-}
-
 
 # ===================================
 #  CONFIGURE, SETUP and LAUNCH
@@ -262,3 +217,14 @@ output {
 }
 }
 
+struct BamData {
+  File bam
+  File bamIndex
+  String libraryDesign
+}
+
+struct SvData {
+  File svFile
+  String workflowName
+  String libraryDesign
+}
