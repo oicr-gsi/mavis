@@ -35,7 +35,23 @@ workflow mavis {
   meta {
    author: "Peter Ruzanov"
    email: "peter.ruzanov@oicr.on.ca"
-   description: "Workflow to annotate structural variants."
+   description: "MAVIS workflow, annotation of structural variants. An application framework for the rapid generation of structural variant consensus, able to visualize the genetic impact and context as well as process both genome and transcriptome data."
+   dependencies: [
+      {
+        name: "mavis/2.2.6",
+        url: "http://mavis.bcgsc.ca/"
+      }
+    ]
+    output_meta: {
+      zippedSummaryTable: "File with copy number variants, native varscan format",
+      zippedDrawings: "Plots generated with MAVIS"
+    }
+  }
+
+  parameter_meta {
+    donor: "Donor id"
+    inputBAMs: "Collection of alignment files with indexes and metadata"
+    svData: "Collection of SV calls with metadata"
   }
 
   output {
@@ -49,34 +65,35 @@ workflow mavis {
 # ===================================
 task runMavis {
   input {
-    Array[File]   inputBAMs
-    Array[File]   inputBAMidx
-    Array[File]   svData
+    Array[File] inputBAMs
+    Array[File] inputBAMidx
+    Array[File] svData
     Array[String] libTypes
     Array[String] svWorkflows
     Array[String] svLibDesigns
-    String? outputCONFIG = "mavis_config.cfg"
-    String? scriptName = "mavis_config.sh"
+    String outputCONFIG = "mavis_config.cfg"
+    String scriptName = "mavis_config.sh"
     String donor
-    String?  referenceGenome = "$HG19_ROOT/hg19_random.fa"
-    String?  annotations = "$HG19_MAVIS_ROOT/ensembl69_hg19_annotations_with_ncrna.json"
-    String?  masking = "$HG19_MAVIS_ROOT/hg19_masking.tab"
-    String?  dvgAnnotations = "$HG19_MAVIS_ROOT/dgv_hg19_variants.tab"
-    String?  alignerReference = "$HG19_MAVIS_ROOT/hg19.2bit"
-    String?  templateMetadata = "$HG19_MAVIS_ROOT/cytoBand.txt"
-    String? mavisAligner = "blat"
-    String? mavisScheduler = "SGE"
-    String? mavisDrawFusionOnly = "False"
-    Int? mavisAnnotationMemory = 32000
-    Int? mavisValidationMemory = 32000
-    Int? mavisTransValidationMemory = 32000
-    Int? mavisMemoryLimit = 32000
-    Int? minClusterPerFile = 5
-    String? drawNonSynonymousCdnaOnly = "False"
-    String? mavisUninformativeFilter = "True"
-    String? modules = "mavis/2.2.6 hg19-mavis/2.2.6 hg19/p13"
-    Int?   jobMemory = 12
-    Int?   sleepInterval = 20
+    String referenceGenome
+    String annotations
+    String masking
+    String dvgAnnotations
+    String alignerReference
+    String templateMetadata
+    String mavisAligner = "blat"
+    String mavisScheduler = "SGE"
+    String mavisDrawFusionOnly = "False"
+    Int mavisAnnotationMemory = 32000
+    Int mavisValidationMemory = 32000
+    Int mavisTransValidationMemory = 32000
+    Int mavisMemoryLimit = 32000
+    Int minClusterPerFile = 5
+    String drawNonSynonymousCdnaOnly = "False"
+    String mavisUninformativeFilter = "True"
+    String modules
+    Int jobMemory = 12
+    Int sleepInterval = 20
+    Int timeout = 24
   }
 
   parameter_meta {
@@ -108,6 +125,7 @@ task runMavis {
     modules: "modules needed to run MAVIS"
     jobMemory: "Memory allocated for this job"
     sleepInterval: "A pause after scheduling step, in seconds"
+    timeout: "Timeout in hours, needed to override imposed limits"
   }
 
   command <<<
@@ -207,6 +225,7 @@ task runMavis {
   runtime {
     memory:  "~{jobMemory} GB"
     modules: "~{modules}"
+    timeout: "~{timeout}"
   }
 
   output {

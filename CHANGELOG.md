@@ -1,3 +1,5 @@
+## 1.0.4 - 2020-05-14
+- Added timeout parameter
 ## 1.0.3 - 2020-02-12
 - [GBS-1766](https://jira.oicr.on.ca/browse/GBS-1766) - Fix issue with cromwell not localizing related files as expected
 ## 1.0.2 - 2020-02-03

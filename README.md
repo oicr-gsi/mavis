@@ -2,12 +2,19 @@
 
 MAVIS workflow, annotation of structural variants. An application framework for the rapid generation of structural variant consensus, able to visualize the genetic impact and context as well as process both genome and transcriptome data.
 
+## Overview
+
+## Dependencies
+
+* [mavis 2.2.6](http://mavis.bcgsc.ca/)
+
 ## Usage
 
 ## Cromwell
 
 ``` 
  java -jar cromwell.jar run mavis.wdl --inputs inputs.json 
+
 ```
 
 ## Running Pipeline
@@ -25,54 +32,81 @@ MAVIS workflow, annotation of structural variants. An application framework for 
 
 The workflow will expect that inputs for SV calls will fall into a few supported formats. Currently they are manta, delly and starfusion (the latter one is for WT). The respective olive will collect whatever data are available and 
 
-## Optional Assembly-specific Parameters:
+### Inputs
 
-hg19-specific data, for other assemblies these should be changed:
+#### Required workflow parameters:
+Parameter|Value|Description
+---|---|---
+`donor`|String|Donor id
+`inputBAMs`|Array[BamData]|Collection of alignment files with indexes and metadata
+`svData`|Array[SvData]|Collection of SV calls with metadata
+`runMavis.referenceGenome`|String|path to fasta file with genomic assembly
+`runMavis.annotations`|String|.json file with annotations for MAVIS
+`runMavis.masking`|String|masking data in .tab format
+`runMavis.dvgAnnotations`|String|The DGV annotations help to deal with variants found in normal tissue
+`runMavis.alignerReference`|String|References in 2bit (compressed) format, used by MAVIS aligner
+`runMavis.templateMetadata`|String|Chromosome Band Information, used for visualization
+`runMavis.modules`|String|modules needed to run MAVIS
 
-Paramter|Value
----|---
-dvgAnnotations | String? (optional, default $HG19_MAVIS_ROOT/dgv_hg19_variants.tab)
-templateMetadata | String? (optional, default $HG19_MAVIS_ROOT/cytoBand.txt)
-annotations | String? (optional, default $HG19_MAVIS_ROOT/ensembl69_hg19_annotations_with_ncrna.json)
-masking | String? (optional, default $HG19_MAVIS_ROOT/hg19_masking.tab)
-referenceGenome | String? (optional, default $HG19_ROOT/hg19_random.fa)
-alignerReference | String? (optional, default $HG19_MAVIS_ROOT/hg19.2bit)
+
+#### Optional workflow parameters:
+Parameter|Value|Default|Description
+---|---|---|---
 
 
-## Other Parameters with default values:
+#### Optional task parameters:
+Parameter|Value|Default|Description
+---|---|---|---
+`runMavis.outputCONFIG`|String|"mavis_config.cfg"|name of config file for MAVIS
+`runMavis.scriptName`|String|"mavis_config.sh"|name for bash script to run mavis configuration, default mavis_config.sh
+`runMavis.mavisAligner`|String|"blat"|blat by default, may be customized
+`runMavis.mavisScheduler`|String|"SGE"|Our cluster environment, sge, SLURM etc.
+`runMavis.mavisDrawFusionOnly`|String|"False"|flag for MAVIS visualization control
+`runMavis.mavisAnnotationMemory`|Int|32000|Memory allocated for annotation step
+`runMavis.mavisValidationMemory`|Int|32000|Memory allocated for validation step
+`runMavis.mavisTransValidationMemory`|Int|32000|Memory allocated for transvalidation step
+`runMavis.mavisMemoryLimit`|Int|32000|Max Memory allocated for MAVIS
+`runMavis.minClusterPerFile`|Int|5|Determines the way parallel calculations are organized
+`runMavis.drawNonSynonymousCdnaOnly`|String|"False"|flag for MAVIS visualization control
+`runMavis.mavisUninformativeFilter`|String|"True"|Should be enabled if used is only interested in events inside genes, speeds up calculations
+`runMavis.jobMemory`|Int|12|Memory allocated for this job
+`runMavis.sleepInterval`|Int|20|A pause after scheduling step, in seconds
+`runMavis.timeout`|Int|24|Timeout in hours, needed to override imposed limits
 
-Paramter|Value
----|---
-mavisValidationMemory | Int? (optional, default = 32000)
-mavisTransValidationMemory | Int? (optional, default = 32000)
-mavisMemoryLimit | Int? (optional, default = 32000)
-minClusterPerFile | Int? (optional, default = 5)
-mavisAnnotationMemory | Int? (optional, default = 32000)
-mavisUninformativeFilter | String? (optional, default = True)
-drawNonSynonymousCdnaOnly | String? (optional, default = False)
-sleepInterval | Int? (optional, default = 20)
-modules | String? (optional, default = "mavis/2.2.6 hg19-mavis/2.2.6 hg19/p13")
-outputCONFIG | String? (optional, default = "mavis_config.cfg")
-mavisAligner | String? (optional, default = "blat")
-mavisScheduler | String? (optional, default = "SGE")
-scriptName | String? (optional, default = "mavis_config.sh")
-mavisDrawFusionOnly | String? (optional, default = "False")
-jobMemory | Int? (optional, default = 12)
 
-## Required Inputs:
+### Outputs
 
-Paramter|Value
----|---
-inputBAMs | Array[Pair[String, File]] type (WG, WT, MR) and path to input bam file
-inputBAMidx | Array[File] indexes of input bam files
-svData | Array[Pair[Pair[String, String], File]] tool name, type (WG, WT, MR) and path to file with AV calls
-donor | String, id for the sample. Olive will use donor
+Output | Type | Description
+---|---|---
+`zippedSummaryTable`|File?|File with copy number variants, native varscan format
+`zippedDrawings`|File?|Plots generated with MAVIS
 
-## Outputs
 
+## Niassa + Cromwell
+
+This WDL workflow is wrapped in a Niassa workflow (https://github.com/oicr-gsi/pipedev/tree/master/pipedev-niassa-cromwell-workflow) so that it can used with the Niassa metadata tracking system (https://github.com/oicr-gsi/niassa).
+
+* Building
 ```
-  zippedDrawings     - all drawings which MAVIS produced
-  zippedSummaryTable - all summary tables which MAVIS produced
-
+mvn clean install
+```
+* Testing
+```
+mvn clean verify \
+-Djava_opts="-Xmx1g -XX:+UseG1GC -XX:+UseStringDeduplication" \
+-DrunTestThreads=2 \
+-DskipITs=false \
+-DskipRunITs=false \
+-DworkingDirectory=/path/to/tmp/ \
+-DschedulingHost=niassa_oozie_host \
+-DwebserviceUrl=http://niassa-url:8080 \
+-DwebserviceUser=niassa_user \
+-DwebservicePassword=niassa_user_password \
+-Dcromwell-host=http://cromwell-url:8000
 ```
 
+## Support
+
+For support, please file an issue on the [Github project](https://github.com/oicr-gsi) or send an email to gsi@oicr.on.ca .
+
+_Generated with generate-markdown-readme (https://github.com/oicr-gsi/gsi-wdl-tools/)_
