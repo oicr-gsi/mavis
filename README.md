@@ -47,6 +47,7 @@ Parameter|Value|Description
 `runMavis.alignerReference`|String|References in 2bit (compressed) format, used by MAVIS aligner
 `runMavis.templateMetadata`|String|Chromosome Band Information, used for visualization
 `runMavis.modules`|String|modules needed to run MAVIS
+`runMavis.arribaConverter`|String|path to arriba conversion script
 
 
 #### Optional workflow parameters:
