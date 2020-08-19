@@ -35,9 +35,10 @@
           "mavis.runMavis.annotations": "$HG19_MAVIS_ROOT/ensembl69_hg19_annotations_with_ncrna.json",
           "mavis.runMavis.masking": "$HG19_MAVIS_ROOT/hg19_masking.tab",
           "mavis.runMavis.dvgAnnotations": "$HG19_MAVIS_ROOT/dgv_hg19_variants.tab",
+          "mavis.runMavis.arribaConverter": "$MAVIS_CONFIG_ROOT/bin/parse_arriba.py",
           "mavis.runMavis.alignerReference": "$HG19_MAVIS_ROOT/hg19.2bit",
           "mavis.runMavis.templateMetadata": "$HG19_MAVIS_ROOT/cytoBand.txt",
-          "mavis.runMavis.modules": "mavis/2.2.6 hg19-mavis/2.2.6 hg19/p13"
+          "mavis.runMavis.modules": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13"
         }
       }
     }
