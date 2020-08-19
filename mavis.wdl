@@ -215,9 +215,9 @@ task runMavis {
           sleep 5
       done
       if [ -f summary/MAVIS-$jobID.COMPLETE ]; then
-          zip -qj $BATCHID"_drawings.zip" *~{donor}\_diseased_*/annotate/*/drawings/*svg \
-                                          *~{donor}\_diseased_*/annotate/*/drawings/*json
-          zip -qj $BATCHID"_summary.zip" summary/mavis_summary_all_*~{donor}.tab
+          zip -qj $BATCHID".~{donor}_drawings.zip" *~{donor}\_diseased_*/annotate/*/drawings/*svg \
+                                                   *~{donor}\_diseased_*/annotate/*/drawings/*json
+          zip -qj $BATCHID".~{donor}_summary.zip" summary/mavis_summary_all_*~{donor}.tab
           exit 0
       fi
       echo "MAVIS job finished but THERE ARE NO RESULTS"
