@@ -95,6 +95,7 @@ task runMavis {
     Int jobMemory = 12
     Int sleepInterval = 20
     Int timeout = 24
+    Int mavisMaxTime = timeout * 1800
   }
 
   parameter_meta {
@@ -128,6 +129,7 @@ task runMavis {
     jobMemory: "Memory allocated for this job"
     sleepInterval: "A pause after scheduling step, in seconds"
     timeout: "Timeout in hours, needed to override imposed limits"
+    mavisMaxTime: "Timeout for MAVIS tasks, in seconds. 1/2 of the timeout"
   }
 
   command <<<
@@ -139,6 +141,7 @@ task runMavis {
     export MAVIS_DGV_ANNOTATION=~{dvgAnnotations}
     export MAVIS_ALIGNER_REFERENCE=~{alignerReference}
     export MAVIS_TEMPLATE_METADATA=~{templateMetadata}
+    export MAVIS_TIME_LIMIT=~{mavisMaxTime}
     python <<CODE
 
     libtypes = {'WT': "transcriptome", 'MR': "transcriptome", 'WG': "genome"}

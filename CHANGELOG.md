@@ -1,3 +1,5 @@
+## 1.1   - 2020-10-10
+- Added Arriba support, exposed MAVIS_TIME_LIMIT env. variable for better control of the timeout for steps in MAVIS pipeline
 ## 1.0.4 - 2020-05-14
 - Added timeout parameter
 ## 1.0.3 - 2020-02-12

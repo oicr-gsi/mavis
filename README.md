@@ -49,12 +49,6 @@ Parameter|Value|Description
 `runMavis.modules`|String|modules needed to run MAVIS
 `runMavis.arribaConverter`|String|path to arriba conversion script
 
-
-#### Optional workflow parameters:
-Parameter|Value|Default|Description
----|---|---|---
-
-
 #### Optional task parameters:
 Parameter|Value|Default|Description
 ---|---|---|---
@@ -73,7 +67,7 @@ Parameter|Value|Default|Description
 `runMavis.jobMemory`|Int|12|Memory allocated for this job
 `runMavis.sleepInterval`|Int|20|A pause after scheduling step, in seconds
 `runMavis.timeout`|Int|24|Timeout in hours, needed to override imposed limits
-
+`runMavis.mavisMaxTime`|Int|1/2 of the `runMavis.timeout`|Timeout for MAVIS tasks, in seconds
 
 ### Outputs
 
