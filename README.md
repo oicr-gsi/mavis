@@ -47,12 +47,7 @@ Parameter|Value|Description
 `runMavis.alignerReference`|String|References in 2bit (compressed) format, used by MAVIS aligner
 `runMavis.templateMetadata`|String|Chromosome Band Information, used for visualization
 `runMavis.modules`|String|modules needed to run MAVIS
-
-
-#### Optional workflow parameters:
-Parameter|Value|Default|Description
----|---|---|---
-
+`runMavis.arribaConverter`|String|path to arriba conversion script
 
 #### Optional task parameters:
 Parameter|Value|Default|Description
@@ -72,7 +67,7 @@ Parameter|Value|Default|Description
 `runMavis.jobMemory`|Int|12|Memory allocated for this job
 `runMavis.sleepInterval`|Int|20|A pause after scheduling step, in seconds
 `runMavis.timeout`|Int|24|Timeout in hours, needed to override imposed limits
-
+`runMavis.mavisMaxTime`|Int|1/2 of the `runMavis.timeout`|Timeout for MAVIS tasks, in seconds
 
 ### Outputs
 

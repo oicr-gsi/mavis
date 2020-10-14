@@ -73,6 +73,7 @@ task runMavis {
     Array[String] svLibDesigns
     String outputCONFIG = "mavis_config.cfg"
     String scriptName = "mavis_config.sh"
+    String arribaConverter
     String donor
     String referenceGenome
     String annotations
@@ -94,6 +95,7 @@ task runMavis {
     Int jobMemory = 12
     Int sleepInterval = 20
     Int timeout = 24
+    Int mavisMaxTime = timeout * 1800
   }
 
   parameter_meta {
@@ -105,6 +107,7 @@ task runMavis {
     svLibDesigns: "List of library designs to accompany the list of SV calls"
     outputCONFIG: "name of config file for MAVIS"
     scriptName: "name for bash script to run mavis configuration, default mavis_config.sh"
+    arribaConverter: "path to arriba conversion script"
     donor: "donor id, i.e. PCSI_0001 Identifies a patient, cell culture grown at certain condition etc."
     referenceGenome: "path to fasta file with genomic assembly"
     annotations: ".json file with annotations for MAVIS"
@@ -126,6 +129,7 @@ task runMavis {
     jobMemory: "Memory allocated for this job"
     sleepInterval: "A pause after scheduling step, in seconds"
     timeout: "Timeout in hours, needed to override imposed limits"
+    mavisMaxTime: "Timeout for MAVIS tasks, in seconds. 1/2 of the timeout"
   }
 
   command <<<
@@ -137,10 +141,11 @@ task runMavis {
     export MAVIS_DGV_ANNOTATION=~{dvgAnnotations}
     export MAVIS_ALIGNER_REFERENCE=~{alignerReference}
     export MAVIS_TEMPLATE_METADATA=~{templateMetadata}
+    export MAVIS_TIME_LIMIT=~{mavisMaxTime}
     python <<CODE
 
     libtypes = {'WT': "transcriptome", 'MR': "transcriptome", 'WG': "genome"}
-    wfMappings = {'StructuralVariation': 'delly', 'delly': 'delly', 'StarFusion': 'starfusion', 'manta': 'manta'}
+    wfMappings = {'StructuralVariation': 'delly', 'delly': 'delly', 'arriba' : 'arriba', 'StarFusion': 'starfusion', 'manta': 'manta'}
 
     b = "~{sep=' ' inputBAMs}"
     bams = b.split()
@@ -168,7 +173,10 @@ task runMavis {
     for s in range(len(svdata)):
      for w in wfMappings.keys():
          if w in wfs[s]:
-             convert_lines.append( "--convert " + wfMappings[w] + " " + svdata[s] + " " + wfMappings[w] + " \\\\" )
+             if w == 'arriba':
+                 convert_lines.append( "--external_conversion arriba \"~{arribaConverter}  " + svdata[s] + "\"" + " \\\\" )
+             else:
+                 convert_lines.append( "--convert " + wfMappings[w] + " " + svdata[s] + " " + wfMappings[w] + " \\\\" )
              assign_arrays[svlibs[s]].append(wfMappings[w])
 
     for b in range(len(bams)):
@@ -210,9 +218,9 @@ task runMavis {
           sleep 5
       done
       if [ -f summary/MAVIS-$jobID.COMPLETE ]; then
-          zip -qj $BATCHID"_drawings.zip" *~{donor}\_diseased_*/annotate/*/drawings/*svg \
-                                          *~{donor}\_diseased_*/annotate/*/drawings/*json
-          zip -qj $BATCHID"_summary.zip" summary/mavis_summary_all_*~{donor}.tab
+          zip -qj $BATCHID".~{donor}_drawings.zip" *~{donor}\_diseased_*/annotate/*/drawings/*svg \
+                                                   *~{donor}\_diseased_*/annotate/*/drawings/*json
+          zip -qj $BATCHID".~{donor}_summary.zip" summary/mavis_summary_all_*~{donor}.tab
           exit 0
       fi
       echo "MAVIS job finished but THERE ARE NO RESULTS"
