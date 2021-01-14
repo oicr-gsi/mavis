@@ -206,6 +206,72 @@ task runMavisConfig {
   }
 }
 
+task runMavisSetup {
+  # TODO set environment variables as in original workflow
+  # TODO find the scripts created by setup and run them as WDL task arrays
+  # TODO some mavis environment variables intended for cluster submittion may not be needed
+
+  input {
+    File configFile
+    String referenceGenome
+    String annotations
+    String masking
+    String dvgAnnotations
+    String alignerReference
+    String templateMetadata
+    String mavisAligner = "blat"
+    String mavisScheduler = "SGE"
+    String mavisDrawFusionOnly = "False"
+    Int mavisAnnotationMemory = 32000
+    Int mavisValidationMemory = 32000
+    Int mavisTransValidationMemory = 32000
+    Int mavisMemoryLimit = 32000
+    Int minClusterPerFile = 5
+    String drawNonSynonymousCdnaOnly = "False"
+    String mavisUninformativeFilter = "True"
+    String modules
+    Int jobMemory = 12
+    Int sleepInterval = 20
+    Int timeout = 24
+    Int mavisMaxTime = timeout * 1800
+  }
+
+  command <<<
+    unset LD_LIBRARY_PATH  # TODO is this needed?
+    unset LD_LIBRARY_PATH_modshare  # TODO is this needed?
+    export MAVIS_REFERENCE_GENOME=~{referenceGenome}
+    export MAVIS_ANNOTATIONS=~{annotations}
+    export MAVIS_MASKING=~{masking}
+    export MAVIS_DGV_ANNOTATION=~{dvgAnnotations}
+    export MAVIS_ALIGNER_REFERENCE=~{alignerReference}
+    export MAVIS_TEMPLATE_METADATA=~{templateMetadata}
+    export MAVIS_TIME_LIMIT=~{mavisMaxTime}  # TODO is this needed?
+    export MAVIS_ALIGNER='~{mavisAligner}'
+    export MAVIS_SCHEDULER=~{mavisScheduler} # TODO is this needed?
+    export MAVIS_DRAW_FUSIONS_ONLY=~{mavisDrawFusionOnly}
+    export MAVIS_ANNOTATION_MEMORY=~{mavisAnnotationMemory}
+    export MAVIS_VALIDATION_MEMORY=~{mavisValidationMemory}
+    export MAVIS_TRANS_VALIDATION_MEMORY=~{mavisTransValidationMemory}
+    export MAVIS_MEMORY_LIMIT=~{mavisMemoryLimit}
+    export DRAW_NON_SYNONYMOUS_CDNA_ONLY=~{drawNonSynonymousCdnaOnly}
+    export min_clusters_per_file=~{minClusterPerFile}
+    export MAVIS_UNINFORMATIVE_FILTER=~{mavisUninformativeFilter}
+    mavis setup ~{configFile} -o .
+  >>>
+
+  runtime {
+    memory:  "~{jobMemory} GB"
+    modules: "~{modules}"
+    timeout: "~{timeout}"
+  }
+
+  output {
+
+  }
+
+
+}
+
 struct BamData {
   File bam
   File bamIndex
