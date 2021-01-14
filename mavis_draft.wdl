@@ -1,6 +1,6 @@
 version 1.0
 
-workflow mavis_draft {
+workflow mavis {
   input {
     String donor
     Array[BamData] inputBAMs
@@ -47,7 +47,24 @@ workflow mavis_draft {
   }
 
   #call runMavisSetup {
-  #}
+#}
+
+#task validate {
+  #    # TODO run as task array
+#}
+
+
+#task annotate {
+  # TODO run as task array
+#}
+
+
+#task pairing {
+#}
+
+#task summary {
+#}
+
 
   meta {
    author: "Peter Ruzanov, Iain Bancarz"
