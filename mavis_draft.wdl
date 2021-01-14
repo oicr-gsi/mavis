@@ -1,10 +1,13 @@
 version 1.0
 
-workflow write_config_draft {
+workflow mavis_draft {
   input {
     String donor
     Array[BamData] inputBAMs
     Array[SvData] svData
+    String configFileName = "mavis_config.cfg"
+    String scriptFileName = "mavis_config.sh"
+
   }
 
   String sanitized_donor = sub(donor, "_", ".")
@@ -26,14 +29,25 @@ workflow write_config_draft {
 
   call generateMavisConfigFile {
     input:
-      donor = sanitized_donor,
-      inputBAMs = bams,
-      inputBAMidx = bamIndexes,
-      libTypes = bamLibraryDesigns,
-      svData = svFiles,
-      svWorkflows = workflowNames,
-      svLibDesigns = svLibraryDesigns
+    donor = sanitized_donor,
+    inputBAMs = bams,
+    inputBAMidx = bamIndexes,
+    libTypes = bamLibraryDesigns,
+    svData = svFiles,
+    svWorkflows = workflowNames,
+    svLibDesigns = svLibraryDesigns,
+    configFileName = configFileName,
+    scriptFileName = scriptFileName
   }
+
+  call runMavisConfig {
+    input:
+    configScript = generateMavisConfigFile.configScript,
+    configName = configFileName
+  }
+
+  #call runMavisSetup {
+  #}
 
   meta {
    author: "Peter Ruzanov, Iain Bancarz"
@@ -58,7 +72,7 @@ workflow write_config_draft {
   }
 
   output {
-    File configScript = generateMavisConfigFile.configScript
+    File mavisConfig = runMavisConfig.configFile
   }
 }
 
@@ -71,8 +85,8 @@ task generateMavisConfigFile {
     Array[String] libTypes
     Array[String] svWorkflows
     Array[String] svLibDesigns
-    String outputConfig = "mavis_config.cfg"
-    String scriptName = "mavis_config.sh"
+    String configFileName = "mavis_config.cfg"
+    String scriptFileName = "mavis_config.sh"
     String arribaConverter
     String donor
     String modules
@@ -125,27 +139,54 @@ task generateMavisConfigFile {
            tools = separator.join(assign_arrays[libs[b]])
            assign_lines.append( "--assign " + libs[b] + ".~{donor} " + tools + " \\\\" )
 
-    f = open("~{scriptName}","w+")
+    f = open("~{scriptFileName}","w+")
     f.write("#!/bin/bash" + "\n\n")
     f.write('mavis config \\\\\n')
     f.write('\n'.join(library_lines) + '\n')
     f.write('\n'.join(convert_lines) + '\n')
     f.write('\n'.join(assign_lines) + '\n')
-    f.write("--write ~{outputConfig}\n")
+    f.write("--write ~{configFileName}\n")
     f.close()
     CODE
   >>>
 
-   runtime {
+  runtime {
+    memory:  "~{jobMemory} GB"
+    modules: "~{modules}"
+    timeout: "~{timeout}"  
+  }
+
+  output {
+    File configScript = scriptFileName
+  }
+
+}
+
+task runMavisConfig {
+
+  input {
+    File configScript
+    String configName
+    String modules
+    Int jobMemory = 12
+    Int sleepInterval = 20
+    Int timeout = 24
+  }
+
+  command <<<
+    chmod +x ~{configScript}
+    ~{configScript}
+  >>>
+
+  runtime {
     memory:  "~{jobMemory} GB"
     modules: "~{modules}"
     timeout: "~{timeout}"
-  
-}
-  output {
-    File configScript = scriptName
   }
 
+  output {
+    File configFile = configName
+  }
 }
 
 struct BamData {
