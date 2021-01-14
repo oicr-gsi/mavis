@@ -46,8 +46,10 @@ workflow mavis {
     configName = configFileName
   }
 
-  #call runMavisSetup {
-#}
+  call runMavisSetup {
+    input:
+    configFile = runMavisConfig.configFile
+  }
 
 #task validate {
   #    # TODO run as task array
@@ -180,6 +182,8 @@ task generateMavisConfigFile {
 }
 
 task runMavisConfig {
+
+  # TODO needs environment variables -- will run successfully without them, but leave blank params which cause failure in next task
 
   input {
     File configScript
