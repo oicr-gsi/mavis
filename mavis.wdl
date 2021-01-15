@@ -92,6 +92,12 @@ workflow mavis {
 
   output {
     File mavisConfig = runMavisConfig.configFile
+    Array[File] clusterTabs = runMavisSetup.clusterTabs
+    File submitValidate = runMavisSetup.submitValidate
+    File submitAnnotate = runMavisSetup.submitAnnotate
+    File submitPairing = runMavisSetup.submitPairing
+    File submitSummary = runMavisSetup.submitSummary
+
   }
 }
 
@@ -183,18 +189,32 @@ task generateMavisConfigFile {
 
 task runMavisConfig {
 
-  # TODO needs environment variables -- will run successfully without them, but leave blank params which cause failure in next task
+  # needs environment variables -- will run successfully without them, but leave blank params which cause failure in next task
 
   input {
     File configScript
     String configName
+    String referenceGenome
+    String annotations
+    String masking
+    String dvgAnnotations
+    String alignerReference
+    String templateMetadata
     String modules
     Int jobMemory = 12
     Int sleepInterval = 20
     Int timeout = 24
+    Int mavisMaxTime = timeout * 1800
   }
 
   command <<<
+    export MAVIS_REFERENCE_GENOME=~{referenceGenome}
+    export MAVIS_ANNOTATIONS=~{annotations}
+    export MAVIS_MASKING=~{masking}
+    export MAVIS_DGV_ANNOTATION=~{dvgAnnotations}
+    export MAVIS_ALIGNER_REFERENCE=~{alignerReference}
+    export MAVIS_TEMPLATE_METADATA=~{templateMetadata}
+    export MAVIS_TIME_LIMIT=~{mavisMaxTime}  # TODO is this needed?
     chmod +x ~{configScript}
     ~{configScript}
   >>>
@@ -211,18 +231,12 @@ task runMavisConfig {
 }
 
 task runMavisSetup {
-  # TODO set environment variables as in original workflow
+
   # TODO find the scripts created by setup and run them as WDL task arrays
-  # TODO some mavis environment variables intended for cluster submittion may not be needed
+  # TODO some mavis environment variables intended for cluster submission may not be needed
 
   input {
     File configFile
-    String referenceGenome
-    String annotations
-    String masking
-    String dvgAnnotations
-    String alignerReference
-    String templateMetadata
     String mavisAligner = "blat"
     String mavisScheduler = "SGE"
     String mavisDrawFusionOnly = "False"
@@ -237,19 +251,11 @@ task runMavisSetup {
     Int jobMemory = 12
     Int sleepInterval = 20
     Int timeout = 24
-    Int mavisMaxTime = timeout * 1800
   }
 
   command <<<
     unset LD_LIBRARY_PATH  # TODO is this needed?
     unset LD_LIBRARY_PATH_modshare  # TODO is this needed?
-    export MAVIS_REFERENCE_GENOME=~{referenceGenome}
-    export MAVIS_ANNOTATIONS=~{annotations}
-    export MAVIS_MASKING=~{masking}
-    export MAVIS_DGV_ANNOTATION=~{dvgAnnotations}
-    export MAVIS_ALIGNER_REFERENCE=~{alignerReference}
-    export MAVIS_TEMPLATE_METADATA=~{templateMetadata}
-    export MAVIS_TIME_LIMIT=~{mavisMaxTime}  # TODO is this needed?
     export MAVIS_ALIGNER='~{mavisAligner}'
     export MAVIS_SCHEDULER=~{mavisScheduler} # TODO is this needed?
     export MAVIS_DRAW_FUSIONS_ONLY=~{mavisDrawFusionOnly}
@@ -270,7 +276,13 @@ task runMavisSetup {
   }
 
   output {
-
+    # TODO do we need cluster_assignment.tab, clusters.bed and filtered_pairs.tab? Apparently not, they only occur in the .log
+    # TODO will repeated "submit.sh" filename cause problems for input to next step?
+    Array[File] clusterTabs = glob("*/cluster/batch*.tab")
+    File submitValidate = glob("*/validate/submit.sh")[0]
+    File submitAnnotate = glob("*/annotate/submit.sh")[0]
+    File submitPairing = "pairing/submit.sh"
+    File submitSummary = "summary/submit.sh"
   }
 
 
