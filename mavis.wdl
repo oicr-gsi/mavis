@@ -292,6 +292,7 @@ task validate {
 
   command <<<
     sed -i "s|^[[:space:]]*cd .*||g" ~{submitValidate} # do not change the working directory
+    sed -i "s|^[[:space:]]*echo .*||g" ~{submitValidate} # do not echo start/finish times
     sed -i "s|--inputs .*|--inputs ~{clusterTab} \\\\|g" ~{submitValidate}
     sed -i "s|--output .*|--output .|g" ~{submitValidate}
     ~{submitValidate}
