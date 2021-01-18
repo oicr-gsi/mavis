@@ -51,21 +51,13 @@ workflow mavis {
     configFile = runMavisConfig.configFile
   }
 
-#task validate {
-  #    # TODO run as task array
-#}
+  scatter(ct in runMavisSetup.clusterTabs) {
+    call validate {input: clusterTab=ct, submitValidate=runMavisSetup.submitValidate}
+    #call annotate(input: inFile=validate.outFile, script=submitAnnotate)
+  }
+  #call pairing(input: annotate.outFile, script=submitPairing)
+  #call summary(input: pairing.outFile, script=submitSummary)
 
-
-#task annotate {
-  # TODO run as task array
-#}
-
-
-#task pairing {
-#}
-
-#task summary {
-#}
 
 
   meta {
@@ -284,7 +276,33 @@ task runMavisSetup {
     File submitPairing = "pairing/submit.sh"
     File submitSummary = "summary/submit.sh"
   }
+}
 
+task validate {
+
+  # edit input/output arguments within the submit script, and run it
+
+  input {
+    File clusterTab
+    File submitValidate
+    String modules
+    Int jobMemory = 12
+    Int timeout = 24
+    String outName = "validated"
+  }
+
+  command <<<
+    # Need to explicitly specify $PWD for parallel execution
+    mkdir ~{outName}
+    sed -i "s|--inputs .*|--inputs ~{clusterTab} \\\\|g" ~{submitValidate}
+    sed -i "s|--output .*|--output $PWD/~{outName}|g" ~{submitValidate}
+    sed -i "s|echo .*||g" ~{submitValidate} # echoing start/end times is not needed
+    ~{submitValidate}
+  >>>
+
+  output {
+    Array[File] outFiles = glob("~{outName}/*")
+  }
 
 }
 
