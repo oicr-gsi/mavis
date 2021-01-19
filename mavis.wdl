@@ -64,9 +64,8 @@ workflow mavis {
     input: inFiles=pairing.outFiles, script=setup.submitSummary, outDirName="summary"
   }
 
-  # TODO find the batchID from mavis config, as in previous workflow
   call zipResults {
-    input: drawings=flatten(annotate.drawings), summaries=summary.outFiles, batchID="batch", donor=sanitized_donor
+    input: drawings=flatten(annotate.drawings), summaries=summary.outFiles, batchID=setup.batchID, donor=sanitized_donor
   }
 
   meta {
@@ -249,6 +248,8 @@ task setup {
     Int timeout = 24
   }
 
+  String batchFileName = "batch.txt"
+
   command <<<
     unset LD_LIBRARY_PATH  # TODO is this needed?
     unset LD_LIBRARY_PATH_modshare  # TODO is this needed?
@@ -264,6 +265,7 @@ task setup {
     export min_clusters_per_file=~{minClusterPerFile}
     export MAVIS_UNINFORMATIVE_FILTER=~{mavisUninformativeFilter}
     mavis setup ~{configFile} -o .
+    grep MS_batch ~{configFile} | grep -v \] | sed s/.*-// | tail -n 1 | sed s/\n// > ~{batchFileName}
   >>>
 
   runtime {
@@ -280,6 +282,7 @@ task setup {
     File submitAnnotate = glob("*/annotate/submit.sh")[0]
     File submitPairing = "pairing/submit.sh"
     File submitSummary = "summary/submit.sh"
+    String batchID = read_string("~{batchFileName}")
   }
 }
 
@@ -296,7 +299,7 @@ task validate {
     Int timeout = 24
   }
 
-  # order of --inputs and --output is inconsistent; always follow with a \
+  # TODO fix this. order of --inputs and --output is inconsistent; always follow with a \
 
   command <<<
     sed -i "s|^[[:space:]]*cd .*||g" ~{script} # do not change the working directory
@@ -325,7 +328,7 @@ task annotate {
     Int timeout = 24
   }
 
-  # order of --inputs and --output is inconsistent; always follow with a \
+  # TODO fix this. order of --inputs and --output is inconsistent; always follow with a \
 
   command <<<
     sed -i "s|^[[:space:]]*cd .*||g" ~{script} # do not change the working directory
@@ -334,12 +337,6 @@ task annotate {
     sed -i "s|--output .*|--output . \\\\|g" ~{script}
     chmod +x ~{script}
     ~{script}
-    # dummy "drawings" for testing
-    #mkdir -p drawings
-    #touch drawings/foo.json
-    #touch drawings/foo.svg
-    #touch drawings/bar.json
-    #touch drawings/bar.svg
   >>>
 
   output {
@@ -392,9 +389,13 @@ task zipResults {
 
   # TODO is -j appropriate? What if some files have the same name?
 
+  # change from previous release -- separate batch and donor by _ not .
+  # this way, results are not lost if the batchID is empty
+  # alternatively -- insert a dummy value of batchID is empty
+  
   command <<<
-    zip -qj ~{batchID}.~{donor}_drawings.zip ~{sep=' ' drawings}
-    zip -qj ~{batchID}.~{donor}_summary.zip ~{sep=' ' summaries}
+    zip -qj ~{batchID}_~{donor}_drawings.zip ~{sep=' ' drawings}
+    zip -qj ~{batchID}_~{donor}_summary.zip ~{sep=' ' summaries}
   >>>
 
   output {
