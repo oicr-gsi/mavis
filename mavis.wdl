@@ -64,7 +64,10 @@ workflow mavis {
     input: inFiles=pairing.outFiles, script=setup.submitSummary, outDirName="summary"
   }
 
-  # TODO add a task to zip up the annotation drawings and summary files, and add to output
+  # TODO find the batchID from mavis config, as in previous workflow
+  call zipResults {
+    input: drawings=flatten(annotate.drawings), summaries=summary.outFiles, batchID="batch", donor=sanitized_donor
+  }
 
   meta {
    author: "Peter Ruzanov, Iain Bancarz"
@@ -77,7 +80,7 @@ workflow mavis {
       }
     ]
     output_meta: {
-      zippedSummaryTable: "File with copy number variants, native varscan format",
+      zippedSummary: "File with copy number variants, native varscan format",
       zippedDrawings: "Plots generated with MAVIS"
     }
   }
@@ -89,12 +92,8 @@ workflow mavis {
   }
 
   output {
-    File mavisConfig = config.configFile
-    Array[File] clusterTabs = setup.clusterTabs
-    File submitValidate = setup.submitValidate
-    File submitAnnotate = setup.submitAnnotate
-    File submitPairing = setup.submitPairing
-    File submitSummary = setup.submitSummary
+    Array[File?] zippedDrawings = zipResults.zippedDrawings
+    Array[File?] zippedSummary = zipResults.zippedSummary
   }
 }
 
@@ -377,7 +376,31 @@ task submitMultiple {
   output {
     Array[File] outFiles = glob("~{outDirName}/*\.tab")
   }
+}
 
+task zipResults {
+
+  input {
+    Array[File] drawings
+    Array[File] summaries
+    String batchID
+    String donor
+    String modules
+    Int jobMemory = 12
+    Int timeout = 24
+  }
+
+  # TODO is -j appropriate? What if some files have the same name?
+
+  command <<<
+    zip -qj ~{batchID}.~{donor}_drawings.zip ~{sep=' ' drawings}
+    zip -qj ~{batchID}.~{donor}_summary.zip ~{sep=' ' summaries}
+  >>>
+
+  output {
+    Array[File?] zippedDrawings = glob('*drawings.zip')
+    Array[File?] zippedSummary = glob('*summary.zip')
+  }
 }
 
 
