@@ -5,11 +5,11 @@ workflow mavis {
     String donor
     Array[BamData] inputBAMs
     Array[SvData] svData
-    String configFileName = "mavis_config.cfg"
-    String scriptFileName = "mavis_config.sh"
   }
 
   String sanitized_donor = sub(donor, "_", ".")
+  String configFileName = "mavis_config.cfg"
+  String scriptFileName = "mavis_config.sh"
 
   scatter(b in inputBAMs) {
     File bams = b.bam
