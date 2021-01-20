@@ -55,15 +55,29 @@ workflow mavis {
       input: inFiles=validate.outFile, script=setup.submitAnnotate
     }
   }
+
   call submitMultiple as pairing {
     input: inFiles=annotate.outFile, script=setup.submitPairing, outDirName="pairing"
   }
+
   call submitMultiple as summary {
     input: inFiles=pairing.outFiles, script=setup.submitSummary, outDirName="summary"
   }
 
   call zipResults {
     input: drawings=flatten(annotate.drawings), summaries=summary.outFiles, batchID=setup.batchID, donor=sanitized_donor
+  }
+
+  # find the (required) summary.zip and (optional) drawings.zip
+  File zippedSummaryFinal = zipResults.zippedSummaryArray[0]
+  if (length(zipResults.zippedDrawingsArray)>0) {
+    File? zippedDrawingsFile = zipResults.zippedDrawingsArray[0]
+  }
+  File? zippedDrawingsFinal = zippedDrawingsFile
+
+  output {
+    File zippedSummary = zippedSummaryFinal
+    File? zippedDrawings = zippedDrawingsFinal
   }
 
   meta {
@@ -78,7 +92,7 @@ workflow mavis {
     ]
     output_meta: {
       zippedSummary: "File with copy number variants, native varscan format",
-      zippedDrawings: "Plots generated with MAVIS"
+      zippedDrawings: "File of plots generated with MAVIS"
     }
   }
 
@@ -88,10 +102,6 @@ workflow mavis {
     svData: "Collection of SV calls with metadata"
   }
 
-  output {
-    Array[File?] zippedDrawings = zipResults.zippedDrawings
-    Array[File?] zippedSummary = zipResults.zippedSummary
-  }
 }
 
 task generateConfigScript {
@@ -514,8 +524,8 @@ task zipResults {
   >>>
 
   output {
-    Array[File?] zippedDrawings = glob('*drawings.zip')
-    Array[File?] zippedSummary = glob('*summary.zip')
+    Array[File?] zippedDrawingsArray = glob('*drawings.zip')
+    Array[File] zippedSummaryArray = glob('*summary.zip')
   }
 }
 
