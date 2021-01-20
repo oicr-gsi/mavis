@@ -69,11 +69,11 @@ workflow mavis {
   }
 
   # find the (required) summary.zip and (optional) drawings.zip
-  File zippedSummaryFinal = zipResults.zippedSummaryArray[0]
+  File zippedSummaryFinal = zipResults.zippedSummaryArray[0] # must be non-null
   if (length(zipResults.zippedDrawingsArray)>0) {
     File? zippedDrawingsFile = zipResults.zippedDrawingsArray[0]
   }
-  File? zippedDrawingsFinal = zippedDrawingsFile
+  File? zippedDrawingsFinal = zippedDrawingsFile # may be null
 
   output {
     File zippedSummary = zippedSummaryFinal
@@ -83,7 +83,7 @@ workflow mavis {
   meta {
    author: "Peter Ruzanov, Iain Bancarz"
    email: "peter.ruzanov@oicr.on.ca, ibancarz@oicr.on.ca"
-   description: "MAVIS workflow, annotation of structural variants. An application framework for the rapid generation of structural variant consensus, able to visualize the genetic impact and context as well as process both genome and transcriptome data."
+   description: "MAVIS workflow, annotation of structural variants. An application framework for the rapid generation of structural variant consensus, able to visualize the genetic impact and context as well as process both genome and transcriptome data. The workflow runs each MAVIS action as a WDL task; this replaces the MAVIS default method, of submitting actions directly to a computing cluster."
    dependencies: [
       {
         name: "mavis/2.2.6",
@@ -213,8 +213,6 @@ task generateConfigScript {
 
 task config {
 
-  # needs environment variables -- will run successfully without them, but leave blank params which cause failure in next task
-
   meta {
     description: "Run the Mavis config script, writing a config file for setup."
     output_meta: {
@@ -249,6 +247,8 @@ task config {
     Int jobMemory = 12
     Int timeout = 24
   }
+
+  # needs environment variables -- will run successfully without them, but leave blank params which cause failure in next task
 
   command <<<
     set -euo pipefail
@@ -528,7 +528,6 @@ task zipResults {
     Array[File] zippedSummaryArray = glob('*summary.zip')
   }
 }
-
 
 struct BamData {
   File bam
