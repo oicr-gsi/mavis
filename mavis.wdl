@@ -387,15 +387,16 @@ task zipResults {
     Int timeout = 24
   }
 
-  # TODO is -j appropriate? What if some files have the same name?
-
-  # change from previous release -- separate batch and donor by _ not .
-  # this way, results are not lost if the batchID is empty
-  # alternatively -- insert a dummy value of batchID is empty
+  # if batchID is empty, replace with a default value
   
   command <<<
-    zip -qj ~{batchID}_~{donor}_drawings.zip ~{sep=' ' drawings}
-    zip -qj ~{batchID}_~{donor}_summary.zip ~{sep=' ' summaries}
+    if [ -z ~{batchID} ]; then
+      BATCH="unknown-batch"
+    else
+      BATCH=~{batchID}
+    fi
+    zip -qj $BATCH.~{donor}_drawings.zip ~{sep=' ' drawings}
+    zip -qj $BATCH.~{donor}_summary.zip ~{sep=' ' summaries}
   >>>
 
   output {
