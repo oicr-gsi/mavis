@@ -309,7 +309,7 @@ task setup {
     String mavisUninformativeFilter = "True"
     Int mavisMaxFiles=200
     String modules
-    Int jobMemory = 12
+    Int jobMemory = 32
     Int timeout = 24
   }
 
@@ -370,7 +370,7 @@ task validate {
     String inFiles # space-separated list
     File script
     String modules
-    Int jobMemory = 12
+    Int jobMemory = 32
     Int timeout = 24
   }
 
@@ -414,7 +414,7 @@ task annotate {
     String inFiles # space-separated list
     File script
     String modules
-    Int jobMemory = 12
+    Int jobMemory = 32
     Int timeout = 24
   }
 
@@ -459,7 +459,7 @@ task submitMultiple {
     File script
     String outDirName
     String modules
-    Int jobMemory = 12
+    Int jobMemory = 32
     Int timeout = 24
   }
 
