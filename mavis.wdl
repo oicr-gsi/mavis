@@ -380,7 +380,12 @@ task validate {
     sed -i "s|^[[:space:]]*echo .*||g" ~{script} # do not echo start/finish times
     sed -i "s|--inputs .*|--inputs ~{inFiles} \\\\|g" ~{script}
     sed -i "s|--output .*|--output .|g" ~{script}
+    ### troubleshooting starts
+    sed -i "s|^START_TIME|env > env_submit.txt|g" ~{script}
+    env > env_command.txt
+    ### troubleshooting ends
     chmod +x ~{script}
+
     ~{script}
   >>>
 
@@ -424,6 +429,10 @@ task annotate {
     sed -i "s|^[[:space:]]*echo .*||g" ~{script} # do not echo start/finish times
     sed -i "s|--output .*|--output . \\\\|g" ~{script}
     sed -i "s|--inputs .*|--inputs ~{inFiles}|g" ~{script}
+    ### troubleshooting starts
+    sed -i "s|^START_TIME|env > env_submit.txt|g" ~{script}
+    env > env_command.txt
+    ### troubleshooting ends
     chmod +x ~{script}
     ~{script}
   >>>
@@ -472,6 +481,10 @@ task submitMultiple {
     sed -i "s|^[[:space:]]*echo .*||g" ~{script} # do not echo start/finish times
     sed -i "s|--inputs .*|--inputs ~{sep=' ' inFiles} \\\\|g" ~{script}
     sed -i "s|--output .*|--output ~{outDirName} \\\\|g" ~{script}
+    ### troubleshooting starts
+    sed -i "s|^START_TIME|env > env_submit.txt|g" ~{script}
+    env > env_command.txt
+    ### troubleshooting ends
     chmod +x ~{script}
     ~{script}
   >>>
