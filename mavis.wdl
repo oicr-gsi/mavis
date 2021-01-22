@@ -202,7 +202,7 @@ task generateConfigScript {
   runtime {
     memory:  "~{jobMemory} GB"
     modules: "~{modules}"
-    timeout: "~{timeout}"  
+    timeout: "~{timeout}"
   }
 
   output {
@@ -380,14 +380,16 @@ task validate {
     sed -i "s|^[[:space:]]*echo .*||g" ~{script} # do not echo start/finish times
     sed -i "s|--inputs .*|--inputs ~{inFiles} \\\\|g" ~{script}
     sed -i "s|--output .*|--output .|g" ~{script}
-    ### troubleshooting starts
-    sed -i "s|^START_TIME|env > env_submit.txt|g" ~{script}
-    env > env_command.txt
-    ### troubleshooting ends
     chmod +x ~{script}
 
     ~{script}
   >>>
+
+  runtime {
+    memory:  "~{jobMemory} GB"
+    modules: "~{modules}"
+    timeout: "~{timeout}"
+  }
 
   output {
     File outFile = "validation-passed.tab"
@@ -429,13 +431,15 @@ task annotate {
     sed -i "s|^[[:space:]]*echo .*||g" ~{script} # do not echo start/finish times
     sed -i "s|--output .*|--output . \\\\|g" ~{script}
     sed -i "s|--inputs .*|--inputs ~{inFiles}|g" ~{script}
-    ### troubleshooting starts
-    sed -i "s|^START_TIME|env > env_submit.txt|g" ~{script}
-    env > env_command.txt
-    ### troubleshooting ends
     chmod +x ~{script}
     ~{script}
   >>>
+
+  runtime {
+    memory:  "~{jobMemory} GB"
+    modules: "~{modules}"
+    timeout: "~{timeout}"
+  }
 
   output {
     File outFile = "annotations.tab"
@@ -481,13 +485,15 @@ task submitMultiple {
     sed -i "s|^[[:space:]]*echo .*||g" ~{script} # do not echo start/finish times
     sed -i "s|--inputs .*|--inputs ~{sep=' ' inFiles} \\\\|g" ~{script}
     sed -i "s|--output .*|--output ~{outDirName} \\\\|g" ~{script}
-    ### troubleshooting starts
-    sed -i "s|^START_TIME|env > env_submit.txt|g" ~{script}
-    env > env_command.txt
-    ### troubleshooting ends
     chmod +x ~{script}
     ~{script}
   >>>
+
+  runtime {
+    memory:  "~{jobMemory} GB"
+    modules: "~{modules}"
+    timeout: "~{timeout}"
+  }
 
   output {
     Array[File] outFiles = glob("~{outDirName}/*\.tab")
@@ -535,6 +541,12 @@ task zipResults {
     zip -qj $BATCH.~{donor}_drawings.zip ~{sep=' ' drawings}
     zip -qj $BATCH.~{donor}_summary.zip ~{sep=' ' summaries}
   >>>
+
+  runtime {
+    memory:  "~{jobMemory} GB"
+    modules: "~{modules}"
+    timeout: "~{timeout}"
+  }
 
   output {
     Array[File?] zippedDrawingsArray = glob('*drawings.zip')
