@@ -11,7 +11,6 @@ workflow mavis {
   String sanitized_donor = sub(donor, "_", ".")
   String configFileName = "mavis_config.cfg"
   String scriptFileName = "mavis_config.sh"
-  File libTypeMapFile = write_json(libTypeMap)
 
   scatter(b in inputBAMs) {
     File bams = b.bam
@@ -31,7 +30,7 @@ workflow mavis {
     inputBAMs = bams,
     inputBAMidx = bamIndexes,
     libTypes = bamLibraryDesigns,
-    libTypeMapFile = libTypeMapFile,
+    libTypeMap = libTypeMap,
     svData = svFiles,
     svWorkflows = workflowNames,
     svLibDesigns = svLibraryDesigns,
@@ -118,7 +117,7 @@ task generateConfigScript {
     inputBAMidx: "Array of input BAM index files"
     svData: "Array of somatic variant data files"
     libTypes: "Array of library type strings"
-    libTypeMapFile: "JSON file with mapping from library type strings to Mavis library types"
+    libTypeMap: "Mapping from library type strings to Mavis library types"
     svWorkflows: "Array of somatic variant workflow strings"
     svLibDesigns: "Array of somatic variant library design strings"
     configFileName: "Name of file output from the config bash script"
@@ -135,7 +134,7 @@ task generateConfigScript {
     Array[File] inputBAMidx
     Array[File] svData
     Array[String] libTypes
-    File libTypeMapFile
+    Map[String, String] libTypeMap
     Array[String] svWorkflows
     Array[String] svLibDesigns
     String configFileName = "mavis_config.cfg"
@@ -151,7 +150,7 @@ task generateConfigScript {
     python <<CODE
     import json
 
-    libtypes = json.loads(open("~{libTypeMapFile}").read())
+    libtypes = json.loads(open("~{write_json(libTypeMap)}").read())
     wfMappings = {'StructuralVariation': 'delly', 'delly': 'delly', 'arriba' : 'arriba', 'StarFusion': 'starfusion', 'manta': 'manta'}
 
     b = "~{sep=' ' inputBAMs}"
