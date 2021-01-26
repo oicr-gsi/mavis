@@ -205,7 +205,7 @@ task generateConfigScript {
   runtime {
     memory:  "~{jobMemory} GB"
     modules: "~{modules}"
-    timeout: "~{timeout}"  
+    timeout: "~{timeout}"
   }
 
   output {
@@ -385,8 +385,15 @@ task validate {
     sed -i "s|--inputs .*|--inputs ~{inFiles} \\\\|g" ~{script}
     sed -i "s|--output .*|--output .|g" ~{script}
     chmod +x ~{script}
+
     ~{script}
   >>>
+
+  runtime {
+    memory:  "~{jobMemory} GB"
+    modules: "~{modules}"
+    timeout: "~{timeout}"
+  }
 
   output {
     File outFile = "validation-passed.tab"
@@ -431,6 +438,12 @@ task annotate {
     chmod +x ~{script}
     ~{script}
   >>>
+
+  runtime {
+    memory:  "~{jobMemory} GB"
+    modules: "~{modules}"
+    timeout: "~{timeout}"
+  }
 
   output {
     File outFile = "annotations.tab"
@@ -480,6 +493,12 @@ task submitMultiple {
     ~{script}
   >>>
 
+  runtime {
+    memory:  "~{jobMemory} GB"
+    modules: "~{modules}"
+    timeout: "~{timeout}"
+  }
+
   output {
     Array[File] outFiles = glob("~{outDirName}/*\.tab")
   }
@@ -527,6 +546,12 @@ task zipOptionalOutput {
       zip -qr ~{outPrefix}.zip ~{outPrefix}
     fi
   >>>
+
+  runtime {
+    memory:  "~{jobMemory} GB"
+    modules: "~{modules}"
+    timeout: "~{timeout}"
+  }
 
   output {
     File? zipArchive = "~{outPrefix}.zip"
