@@ -538,7 +538,7 @@ task zipOptionalOutput {
 
   command <<<
     set -euo pipefail
-    INPUTS=~{sep=' ' inFiles}
+    INPUTS="~{sep=' ' inFiles}"
     if [ -n "$INPUTS" ]; then
       mkdir ~{outPrefix}
       cp -t ~{outPrefix} $INPUTS
