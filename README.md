@@ -68,7 +68,14 @@ Parameter|Value|Description
 `annotate.modules`|String|Environment modules for the task
 `pairing.modules`|String|Environment modules for the task
 `summary.modules`|String|Environment modules for the task
-`zipResults.modules`|String|Environment modules for the task
+`zipDrawings.modules`|String|Environment modules for the task
+`zipSummaries.modules`|String|Environment modules for the task
+
+
+#### Optional workflow parameters:
+Parameter|Value|Default|Description
+---|---|---|---
+`libTypeMap`|Map[String,String]|{"WT": "transcriptome", "MR": "transcriptome", "WG": "genome"}|Mapping from library type strings to Mavis library types
 
 #### Optional task parameters:
 Parameter|Value|Default|Description
@@ -93,8 +100,11 @@ Parameter|Value|Default|Description
 `pairing.timeout`|Int|24|Timeout for the task, in hours
 `summary.jobMemory`|Int|32|Memory for the task, in gigabytes
 `summary.timeout`|Int|24|Timeout for the task, in hours
-`zipResults.jobMemory`|Int|12|Memory for the task, in gigabytes
-`zipResults.timeout`|Int|24|Timeout for the task, in hours
+`zipDrawings.jobMemory`|Int|12|Memory for the task, in gigabytes
+`zipDrawings.timeout`|Int|24|Timeout for the task, in hours
+`zipSummaries.jobMemory`|Int|12|Memory for the task, in gigabytes
+`zipSummaries.timeout`|Int|24|Timeout for the task, in hours
+
 
 ### Outputs
 

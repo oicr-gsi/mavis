@@ -99,6 +99,7 @@ workflow mavis {
     donor: "Donor id"
     inputBAMs: "Collection of alignment files with indexes and metadata"
     svData: "Collection of SV calls with metadata"
+    libTypeMap: "Mapping from library type strings to Mavis library types"
   }
 
 }
