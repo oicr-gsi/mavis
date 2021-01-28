@@ -47,8 +47,7 @@
                         }
                     ],
                     "mavis.validate.modules": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13",
-                    "mavis.zipDrawings.modules": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13",
-		    "mavis.zipSummaries.modules": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13"
+                    "mavis.zipResults.modules": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13"
                 }
             }
         }

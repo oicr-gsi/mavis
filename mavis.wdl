@@ -66,17 +66,12 @@ workflow mavis {
     input: inFiles=pairing.outFiles, script=setup.submitSummary, outDirName="summary"
   }
 
-  call zipOptionalOutput as zipDrawings{
-    input: inFiles=flatten(annotate.drawings), batchID=setup.batchID, donor=sanitized_donor, suffix="drawings"
-  }
-
-  call zipRequiredOutput as zipSummaries{
-    input: inFiles=summary.outFiles, batchID=setup.batchID, donor=sanitized_donor, suffix="summary"
+  call zipResults{
+    input: inFiles=flatten([summary.outFiles, flatten(annotate.drawings)]), batchID=setup.batchID, donor=sanitized_donor
   }
 
   output {
-    File zippedSummary = zipSummaries.zipArchive
-    File? zippedDrawings = zipDrawings.zipArchive
+    File results = zipResults.zipArchive
   }
 
   meta {
@@ -504,66 +499,12 @@ task submitMultiple {
   }
 }
 
-task zipOptionalOutput {
-
-  meta {
-    description: "Gather optional workflow result files (if present) into a .zip archive"
-    output_meta: {
-      zipArchive: "ZIP archive file; may be null"
-    }
-  }
-
-  parameter_meta {
-    inFiles: "Array of input files"
-    batchID: "Batch ID string"
-    donor: "Donor ID string"
-    suffix: "Suffix to identify output, eg. 'summary'"
-    jobMemory: "Memory for the task, in gigabytes"
-    modules: "Environment modules for the task"
-    timeout: "Timeout for the task, in hours"
-  }
-
-  input {
-    Array[File] inFiles
-    String batchID
-    String donor
-    String suffix
-    String modules
-    Int jobMemory = 12
-    Int timeout = 24
-  }
-
-  # create a directory for the zip archive; allows unzip without exploding multiple files into the working directory
-
-  String outPrefix = "~{batchID}.~{donor}_~{suffix}"
-
-  command <<<
-    set -euo pipefail
-    INPUTS="~{sep=' ' inFiles}"
-    if [ -n "$INPUTS" ]; then
-      mkdir ~{outPrefix}
-      cp -t ~{outPrefix} $INPUTS
-      zip -qr ~{outPrefix}.zip ~{outPrefix}
-    fi
-  >>>
-
-  runtime {
-    memory:  "~{jobMemory} GB"
-    modules: "~{modules}"
-    timeout: "~{timeout}"
-  }
-
-  output {
-    File? zipArchive = "~{outPrefix}.zip"
-  }
-}
-
-task zipRequiredOutput {
+task zipResults {
 
   meta {
     description: "Gather required result files into a .zip archive"
     output_meta: {
-      zipArchive: "ZIP archive file; may not be null"
+      zipArchive: "ZIP archive file"
     }
   }
 
@@ -571,7 +512,6 @@ task zipRequiredOutput {
     inFiles: "Array of input files"
     batchID: "Batch ID string"
     donor: "Donor ID string"
-    suffix: "Suffix to identify output, eg. 'summary'"
     jobMemory: "Memory for the task, in gigabytes"
     modules: "Environment modules for the task"
     timeout: "Timeout for the task, in hours"
@@ -581,7 +521,6 @@ task zipRequiredOutput {
     Array[File] inFiles
     String batchID
     String donor
-    String suffix
     String modules
     Int jobMemory = 12
     Int timeout = 24
@@ -589,7 +528,7 @@ task zipRequiredOutput {
 
   # create a directory for the zip archive; allows unzip without exploding multiple files into the working directory
 
-  String outPrefix = "~{batchID}.~{donor}_~{suffix}"
+  String outPrefix = "~{batchID}.~{donor}_mavis-output"
 
   command <<<
     set -euo pipefail
