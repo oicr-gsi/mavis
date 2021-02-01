@@ -2,8 +2,8 @@
 - Extensive rewrite
 - Break up the workflow into multiple tasks
 - Run all actions as WDL tasks, instead of submitting directly to the grid engine
-- Output File and File? instead of Array[File?]
-- Output .zip archives are a directory of files, not a flat collection, for safer unzipping
+- Output File instead of Array[File?]
+- Output .zip archive is a directory of files, not a flat collection, for safer unzipping
 - Detailed checks on output in `test/calculate.sh`
 ## 1.2   - 2020-10-14
 - Updated Arriba support
