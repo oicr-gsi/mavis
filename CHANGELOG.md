@@ -1,5 +1,14 @@
+## 2.0   - 2021-02-01
+- Extensive rewrite
+- Break up the workflow into multiple tasks
+- Run all actions as WDL tasks, instead of submitting directly to the grid engine
+- Output File instead of Array[File?]
+- Output .zip archive is a directory of files, not a flat collection, for safer unzipping
+- Detailed checks on output in `test/calculate.sh`
+## 1.2   - 2020-10-14
+- Updated Arriba support
 ## 1.1   - 2020-10-10
-- Added Arriba support, exposed MAVIS_TIME_LIMIT env. variable for better control of the timeout for steps in MAVIS pipeline
+- Added Arriba support, exposed `MAVIS_TIME_LIMIT` env. variable for better control of the timeout for steps in MAVIS pipeline
 ## 1.0.4 - 2020-05-14
 - Added timeout parameter
 ## 1.0.3 - 2020-02-12

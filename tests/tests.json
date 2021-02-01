@@ -1,46 +1,55 @@
 {
-  "defaults": {
-    "description": "MAVIS workflow test",
-    "metrics_calculate": "calculate.sh",
-    "metrics_compare": "compare.sh",
-    "output_metrics_dir": "/.mounts/labs/gsi/testdata/mavis/output_metrics/",
-    "parameters": {
-      "wdl_options": {
-        "write_to_cache": false,
-        "read_from_cache": false
-      }
-    }
-  },
-  "tests": [
-    {
-      "id": "EPT0068_CHR11_DOWNSAMPLED",
-      "parameters": {
-        "wdl_inputs": {
-          "mavis.svData": [
-            {
-              "workflowName": "StarFusion",
-              "libraryDesign": "WT",
-              "svFile": "/.mounts/labs/gsi/testdata/mavis/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.star-fusion.fusion_predictions.abridged_chr11.tsv"
+    "defaults": {
+        "description": "MAVIS workflow test",
+        "metrics_calculate": "calculate.sh",
+        "metrics_compare": "compare.sh",
+        "output_metrics_dir": "/.mounts/labs/gsi/testdata/mavis/output_metrics/",
+        "parameters": {
+            "wdl_options": {
+                "read_from_cache": false,
+                "write_to_cache": false
             }
-          ],
-          "mavis.inputBAMs": [
-            {
-              "libraryDesign": "WT",
-              "bam": "/.mounts/labs/gsi/testdata/mavis/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.Aligned.sortedByCoord.out_chr11.bam",
-              "bamIndex": "/.mounts/labs/gsi/testdata/mavis/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.Aligned.sortedByCoord.out_chr11.bam.bai"
-            }
-          ],
-          "mavis.donor": "EPT0068",
-          "mavis.runMavis.referenceGenome": "$HG19_ROOT/hg19_random.fa",
-          "mavis.runMavis.annotations": "$HG19_MAVIS_ROOT/ensembl69_hg19_annotations_with_ncrna.json",
-          "mavis.runMavis.masking": "$HG19_MAVIS_ROOT/hg19_masking.tab",
-          "mavis.runMavis.dvgAnnotations": "$HG19_MAVIS_ROOT/dgv_hg19_variants.tab",
-          "mavis.runMavis.arribaConverter": "$MAVIS_CONFIG_ROOT/bin/parse_arriba.py",
-          "mavis.runMavis.alignerReference": "$HG19_MAVIS_ROOT/hg19.2bit",
-          "mavis.runMavis.templateMetadata": "$HG19_MAVIS_ROOT/cytoBand.txt",
-          "mavis.runMavis.modules": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13"
         }
-      }
-    }
-  ]
+    },
+    "tests": [
+        {
+            "id": "EPT0068_CHR11_DOWNSAMPLED",
+            "parameters": {
+                "wdl_inputs": {
+                    "mavis.annotate.modules": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13",
+                    "mavis.config.alignerReference": "$HG19_MAVIS_ROOT/hg19.2bit",
+                    "mavis.config.annotations": "$HG19_MAVIS_ROOT/ensembl69_hg19_annotations_with_ncrna.json",
+                    "mavis.config.dgvAnnotations": "$HG19_MAVIS_ROOT/dgv_hg19_variants.tab",
+                    "mavis.config.masking": "$HG19_MAVIS_ROOT/hg19_masking.tab",
+                    "mavis.config.modules": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13",
+                    "mavis.config.referenceGenome": "$HG19_ROOT/hg19_random.fa",
+                    "mavis.config.templateMetadata": "$HG19_MAVIS_ROOT/cytoBand.txt",
+                    "mavis.donor": "EPT0068",
+                    "mavis.generateConfigScript.arribaConverter": "$MAVIS_CONFIG_ROOT/bin/parse_arriba.py",
+                    "mavis.generateConfigScript.jobMemory": 12,
+                    "mavis.generateConfigScript.modules": "python/3.6",
+                    "mavis.generateConfigScript.timeout": 40,
+                    "mavis.inputBAMs": [
+                        {
+                            "bam": "/.mounts/labs/gsi/testdata/mavis/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.Aligned.sortedByCoord.out_chr11.bam",
+                            "bamIndex": "/.mounts/labs/gsi/testdata/mavis/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.Aligned.sortedByCoord.out_chr11.bam.bai",
+                            "libraryDesign": "WT"
+                        }
+                    ],
+                    "mavis.pairing.modules": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13",
+                    "mavis.setup.modules": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13",
+                    "mavis.summary.modules": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13",
+                    "mavis.svData": [
+                        {
+                            "libraryDesign": "WT",
+                            "svFile": "/.mounts/labs/gsi/testdata/mavis/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.star-fusion.fusion_predictions.abridged_chr11.tsv",
+                            "workflowName": "StarFusion"
+                        }
+                    ],
+                    "mavis.validate.modules": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13",
+                    "mavis.zipResults.modules": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13"
+                }
+            }
+        }
+    ]
 }
