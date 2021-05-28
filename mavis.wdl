@@ -147,7 +147,7 @@ task generateConfigScript {
     import json
 
     libtypes = json.loads(open("~{write_json(libTypeMap)}").read())
-    wfMappings = {'StructuralVariation': 'delly', 'delly': 'delly', 'arriba' : 'arriba', 'StarFusion': 'starfusion', 'manta': 'manta'}
+    wfMappings = {'StructuralVariation': 'delly', 'delly': 'delly', 'arriba' : 'arriba', 'StarFusion': 'starfusion', 'starFusion': 'starfusion', 'manta': 'manta'}
 
     b = "~{sep=' ' inputBAMs}"
     bams = b.split()
@@ -537,9 +537,16 @@ task zipResults {
     zip -qr ~{outPrefix}.zip ~{outPrefix}
   >>>
 
+  runtime {
+    memory:  "~{jobMemory} GB"
+    modules: "~{modules}"
+    timeout: "~{timeout}"
+  }
+
   output {
     File zipArchive = "~{outPrefix}.zip"
   }
+ 
 }
 
 struct BamData {

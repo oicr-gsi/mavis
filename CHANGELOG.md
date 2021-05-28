@@ -1,3 +1,7 @@
+## 2.0.1 - 2021-05-28
+- Fixing issues with starFusion, bringing back runtime section for zip task
+- [GC-8726](https://jira.oicr.on.ca/browse/GC-8726)
+- [GDI-2051](https://jira.oicr.on.ca/browse/GDI-2051)
 ## 2.0   - 2021-02-01
 - Extensive rewrite
 - Break up the workflow into multiple tasks
