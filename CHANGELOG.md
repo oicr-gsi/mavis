@@ -1,4 +1,5 @@
 ## 2.0.1 - 2021-05-28
+- Migrating to Vidarr
 - Fixing issues with starFusion, bringing back runtime section for zip task
 - [GC-8726](https://jira.oicr.on.ca/browse/GC-8726)
 - [GDI-2051](https://jira.oicr.on.ca/browse/GDI-2051)
