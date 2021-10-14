@@ -89,7 +89,10 @@
             "mavis.zipResults.timeout": null
         },
         "description": "MAVIS workflow test",
-        "engineArguments": {},
+        "engineArguments": {
+           "write_to_cache": false,
+           "read_from_cache": false
+        },
         "id": "EPT0068_CHR11_DOWNSAMPLED",
         "metadata": {
             "mavis.results": {
