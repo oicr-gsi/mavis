@@ -67,16 +67,18 @@ workflow mavis {
   }
 
   call zipResults{
-    input: inFiles=flatten([summary.outFiles, flatten(annotate.drawings)]), batchID=setup.batchID, donor=sanitized_donor
+    #input: inFiles=flatten([summary.outFiles, flatten(annotate.drawings)]), batchID=setup.batchID, donor=sanitized_donor
+	input: inFiles=flatten([flatten(annotate.drawings)]), batchID=setup.batchID, donor=sanitized_donor
   }
 
   output {
     File results = zipResults.zipArchive
+    Array[File] summaries = summary.outFiles
   }
 
   meta {
-   author: "Peter Ruzanov, Iain Bancarz"
-   email: "peter.ruzanov@oicr.on.ca, ibancarz@oicr.on.ca"
+   author: "Peter Ruzanov, Iain Bancarz, Lawrence Heisler"
+   email: "peter.ruzanov@oicr.on.ca, ibancarz@oicr.on.ca, lawrence.heisler@oicr.on.ca"
    description: "MAVIS workflow, annotation of structural variants. An application framework for the rapid generation of structural variant consensus, able to visualize the genetic impact and context as well as process both genome and transcriptome data. The workflow runs each MAVIS action as a WDL task; this replaces the MAVIS default method, of submitting actions directly to a computing cluster."
    dependencies: [
       {
@@ -85,7 +87,7 @@ workflow mavis {
       }
     ]
     output_meta: {
-      zippedSummary: "File with copy number variants, native varscan format",
+      summaryFiles: "File with copy number variants, native varscan format",
       zippedDrawings: "File of plots generated with MAVIS"
     }
   }
@@ -528,12 +530,17 @@ task zipResults {
 
   # create a directory for the zip archive; allows unzip without exploding multiple files into the working directory
 
-  String outPrefix = "~{batchID}.~{donor}_mavis-output"
+  #String outPrefix = "~{batchID}.~{donor}_mavis-output"
+  String outPrefix = "~{donor}_drawings"
 
   command <<<
     set -euo pipefail
     mkdir ~{outPrefix}
-    cp -t ~{outPrefix} ~{sep=' ' inFiles}
+    #cp -t ~{outPrefix} ~{sep=' ' inFiles}
+    for file in ~{sep=' ' inFiles}
+    do
+      cp $file ~{outPrefix}
+    done
     zip -qr ~{outPrefix}.zip ~{outPrefix}
   >>>
 
