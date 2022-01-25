@@ -88,9 +88,9 @@ task runMavis {
     Int mavisValidationMemory = 32000
     Int mavisTransValidationMemory = 32000
     Int mavisMemoryLimit = 32000
-    Int minClusterPerFile = 5
+    Int minClusterPerFile = 10
     String drawNonSynonymousCdnaOnly = "False"
-    String mavisUninformativeFilter = "True"
+    String mavisUninformativeFilter = "False"
     String modules
     Int jobMemory = 12
     Int sleepInterval = 20
