@@ -78,7 +78,8 @@
                         },
                         "type": "EXTERNAL"
                     },
-                    "workflowName": "StarFusion"
+                    "workflowName": "StarFusion",
+                    "doFilter": false
                 }
             ],
             "mavis.validate.jobMemory": null,
@@ -89,7 +90,8 @@
             "mavis.zipResults.timeout": null,
             "mavis.filterDellyInput.modules": "bcftools",
             "mavis.filterDellyInput.jobMemory": null,
-            "mavis.filterDellyInput.timeout": null
+            "mavis.filterDellyInput.timeout": null,
+            "mavis.filterDellyInput.svFileBase": null
         },
         "description": "MAVIS workflow test",
         "engineArguments": {
