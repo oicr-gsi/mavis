@@ -86,7 +86,10 @@
             "mavis.validate.timeout": null,
             "mavis.zipResults.jobMemory": null,
             "mavis.zipResults.modules": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13",
-            "mavis.zipResults.timeout": null
+            "mavis.zipResults.timeout": null,
+            "mavis.filterDellyInput.modules": "bcftools",
+            "mavis.filterDellyInput.jobMemory": null,
+            "mavis.filterDellyInput.timeout": null
         },
         "description": "MAVIS workflow test",
         "engineArguments": {
