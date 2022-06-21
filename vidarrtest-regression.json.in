@@ -13,7 +13,7 @@
             "mavis.config.referenceGenome": "$HG19_ROOT/hg19_random.fa",
             "mavis.config.templateMetadata": "$HG19_MAVIS_ROOT/cytoBand.txt",
             "mavis.config.timeout": null,
-            "mavis.donor": "EPT0068",
+            "mavis.sampleId": "EPT0068",
             "mavis.generateConfigScript.arribaConverter": "$MAVIS_CONFIG_ROOT/bin/parse_arriba.py",
             "mavis.generateConfigScript.jobMemory": 12,
             "mavis.generateConfigScript.modules": "python/3.6",
