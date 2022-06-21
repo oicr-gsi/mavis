@@ -16,7 +16,13 @@ workflow mavis {
   }
 
   scatter(s in svData) {
-    File svFiles = s.svFile
+    if( select_first([s.doFilter,false]) && s.workflowName == "delly"){
+      call filterDellyInput {
+        input:
+          svFile = s.svFile,
+      }
+    }
+    File svFiles = select_first([filterDellyInput.fsvFile,s.svFile])
     String workflowNames = s.workflowName
     String svLibraryDesigns = s.libraryDesign
   }
@@ -58,8 +64,48 @@ workflow mavis {
   output {
     File summary = runMavis.summary
     File drawings = runMavis.drawings
+    File? nscvWT   = runMavis.nscvWT
+    File? nscvWG   = runMavis.nscvWG
   }
 }
+
+
+# ===================================
+# OPTIONAL Filter Input Task
+# ===================================
+task filterDellyInput {
+  input {
+    File svFile
+    String modules
+    Int jobMemory = 12
+    Int timeout = 5
+    String svFileBase = basename(svFile,".vcf.gz")
+  }
+  parameter_meta {
+    svFile: "the file that needs to be filtered"
+    modules: "modules needed to run filtering"
+    jobMemory: "Memory allocated for this job"
+    timeout: "Timeout in hours, needed to override imposed limits"
+  }
+
+  command <<<
+    bcftools view -i "%FILTER='PASS'" ~{svFile} -Oz -o ~{svFileBase}.pass.vcf.gz
+  >>>
+
+  runtime {
+    memory:  "~{jobMemory} GB"
+    modules: "~{modules}"
+    timeout: "~{timeout}"
+  }
+
+  output {
+    File fsvFile = "~{svFileBase}.pass.vcf.gz"
+  }
+
+}
+
+
+
 
 # ===================================
 #  CONFIGURE, SETUP and LAUNCH
@@ -223,7 +269,15 @@ task runMavis {
       if [ -f summary/MAVIS-$jobID.COMPLETE ]; then
           zip -qj ~{prefix}".mavis_drawings.zip" *~{sid}\_diseased_*/annotate/*/drawings/*svg \
                                                 *~{sid}\_diseased_*/annotate/*/drawings/*json
-          cp summary/mavis_summary_all_*~{sid}.tab ~{prefix}.mavis.summary.tab
+          ### there should be a single mavis_summary_all file
+          cp summary/mavis_summary_all_*.tab ~{prefix}.mavis_summary.tab
+          ### non-synonymous coding variants are separate into WG or WT files; each may or may not be produced
+          if [ -e summary/mavis_summary_WG.*_non-synonymous_coding_variants.tab ];then
+            cp summary/mavis_summary_WG.*_non-synonymous_coding_variants.tab ~{prefix}.WG_non-synonymous_coding_variants.tab
+          fi
+          if [ -e summary/mavis_summary_WT.*_non-synonymous_coding_variants.tab ];then
+            cp summary/mavis_summary_WT.*_non-synonymous_coding_variants.tab ~{prefix}.WT_non-synonymous_coding_variants.tab
+          fi		  
           exit 0
       fi
       echo "MAVIS job finished but THERE ARE NO RESULTS"
@@ -241,7 +295,9 @@ task runMavis {
 
   output {
     File drawings  = "~{prefix}.mavis_drawings.zip"
-    File summary   = "~{prefix}.mavis.summary.tab"
+    File summary   = "~{prefix}.mavis_summary.tab"
+    File? nscvWT   = "~{prefix}.WT_non-synonymous_coding_variants.tab"
+    File? nscvWG   = "~{prefix}.WG_non-synonymous_coding_variants.tab"
   }
 }
 
@@ -255,4 +311,5 @@ struct SvData {
   File svFile
   String workflowName
   String libraryDesign
+  Boolean? doFilter
 }
