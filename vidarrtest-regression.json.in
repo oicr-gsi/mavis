@@ -95,7 +95,31 @@
         },
         "id": "EPT0068_CHR11_DOWNSAMPLED",
         "metadata": {
-            "mavis.results": {
+            "mavis.summary": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_mavis_EPT0068_CHR11_DOWNSAMPLED_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "mavis.drawings": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_mavis_EPT0068_CHR11_DOWNSAMPLED_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "mavis.nscvWT": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_mavis_EPT0068_CHR11_DOWNSAMPLED_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "mavis.nscvWG": {
                 "contents": [
                     {
                         "outputDirectory": "@SCRATCH@/@DATE@_Workflow_mavis_EPT0068_CHR11_DOWNSAMPLED_@JENKINSID@"
