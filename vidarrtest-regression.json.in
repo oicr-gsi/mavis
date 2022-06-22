@@ -6,7 +6,7 @@
                 {
                     "bam": {
                         "contents": {
-                            "configuration": "/.mounts/labs/gsi/testdata/mavis/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.Aligned.sortedByCoord.out_chr11.bam",
+                            "configuration": "/.mounts/labs/gsi/testdata/mavis/EPT0068_CHR11_DOWNSAMPLED/input_data/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.Aligned.sortedByCoord.out_chr11.bam",
                             "externalIds": [
                                 {
                                     "id": "TEST",
@@ -18,7 +18,7 @@
                     },
                     "bamIndex": {
                         "contents": {
-                            "configuration": "/.mounts/labs/gsi/testdata/mavis/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.Aligned.sortedByCoord.out_chr11.bam.bai",
+                            "configuration": "/.mounts/labs/gsi/testdata/mavis/EPT0068_CHR11_DOWNSAMPLED/input_data/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.Aligned.sortedByCoord.out_chr11.bam.bai",
                             "externalIds": [
                                 {
                                     "id": "TEST",
@@ -36,7 +36,7 @@
                     "libraryDesign": "WT",
                     "svFile": {
                         "contents": {
-                            "configuration": "/.mounts/labs/gsi/testdata/mavis/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.star-fusion.fusion_predictions.abridged_chr11.tsv",
+                            "configuration": "/.mounts/labs/gsi/testdata/mavis/EPT0068_CHR11_DOWNSAMPLED/input_data/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.star-fusion.fusion_predictions.abridged_chr11.tsv",
                             "externalIds": [
                                 {
                                     "id": "TEST",
@@ -132,7 +132,7 @@
             {
                 "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
                 "metrics_compare": "@CHECKOUT@/tests/compare.sh",
-                "output_metrics": "/.mounts/labs/gsi/testdata/mavis/output_metrics/EPT0068_CHR11_DOWNSAMPLED.metrics",
+                "output_metrics": "/.mounts/labs/gsi/testdata/mavis/EPT0068_CHR11_DOWNSAMPLED/output_expectation/metrics/EPT0068_CHR11_DOWNSAMPLED.metrics.txt",
                 "type": "script"
             }
         ]
