@@ -51,7 +51,9 @@ workflow mavis {
     ]
     output_meta: {
       summary: "File with copy number variants, native varscan format",
-      drawings: "Plots generated with MAVIS, collected into a single tar.gz archve"
+      drawings: "Plots generated with MAVIS, collected into a single tar.gz archive"
+      nscvWT: "Whole transcriptome non-synonymous coding variants. The output file is only generated if variants are found"
+      nscvWG: "Whole genome non-synonymous coding variants. The output file is only generated if variants are found"
     }
   }
 
@@ -83,6 +85,7 @@ task filterDellyInput {
   }
   parameter_meta {
     svFile: "the file that needs to be filtered"
+    svFileBase: "the basename of the file, needed to form the output file name"
     modules: "modules needed to run filtering"
     jobMemory: "Memory allocated for this job"
     timeout: "Timeout in hours, needed to override imposed limits"
