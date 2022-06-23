@@ -51,8 +51,8 @@ workflow mavis {
     ]
     output_meta: {
       summary: "File with copy number variants, native varscan format",
-      drawings: "Plots generated with MAVIS, collected into a single tar.gz archive"
-      nscvWT: "Whole transcriptome non-synonymous coding variants. The output file is only generated if variants are found"
+      drawings: "Plots generated with MAVIS, collected into a single tar.gz archive",
+      nscvWT: "Whole transcriptome non-synonymous coding variants. The output file is only generated if variants are found",
       nscvWG: "Whole genome non-synonymous coding variants. The output file is only generated if variants are found"
     }
   }
