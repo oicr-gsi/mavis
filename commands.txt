@@ -79,9 +79,9 @@ Setup Mavis : Inline python code
     CODE
 ```
 
-Run Mavis : Inline bash code.  Drawings and legends are compiled in a zip archive.
->>>
+Run Mavis
 
+```
     chmod +x ~{scriptName}
     ./~{scriptName}
     export MAVIS_ALIGNER='~{mavisAligner}'
@@ -97,31 +97,7 @@ Run Mavis : Inline bash code.  Drawings and legends are compiled in a zip archiv
     mavis setup ~{outputCONFIG} -o .
     BATCHID=$(grep MS_batch build.cfg | grep -v \] | sed s/.*-// | tail -n 1)
     mavis schedule -o . --submit 2> >(tee launch_stderr.log)
-    sleep ~{sleepInterval}
-    LASTJOB=$(cat launch_stderr.log | grep SUBMITTED | tail -n 1 | sed s/.*\(//)
-    num='([0-9^]+)'
-    if [[ $LASTJOB =~ $num ]]; then
-      jobID=$BASH_REMATCH
-      while qstat | grep $jobID; do
-          sleep 5
-      done
-      if [ -f summary/MAVIS-$jobID.COMPLETE ]; then
-          zip -qj ~{prefix}".mavis_drawings.zip" *~{sid}\_diseased_*/annotate/*/drawings/*svg \
-                                                *~{sid}\_diseased_*/annotate/*/drawings/*json
-          ### there should be a single mavis_summary_all file
-          cp summary/mavis_summary_all_*.tab ~{prefix}.mavis_summary.tab
-          ### non-synonymous coding variants are separate into WG or WT files; each may or may not be produced
-          if [ -e summary/mavis_summary_WG.*_non-synonymous_coding_variants.tab ];then
-            cp summary/mavis_summary_WG.*_non-synonymous_coding_variants.tab ~{prefix}.WG_non-synonymous_coding_variants.tab
-          fi
-          if [ -e summary/mavis_summary_WT.*_non-synonymous_coding_variants.tab ];then
-            cp summary/mavis_summary_WT.*_non-synonymous_coding_variants.tab ~{prefix}.WT_non-synonymous_coding_variants.tab
-          fi		  
-          exit 0
-      fi
-      echo "MAVIS job finished but THERE ARE NO RESULTS"
-      exit 1
-    fi
-    echo "Could not retrieve last job id"
-    exit 1
-  >>>
+```
+
+Compile results.  Drawings and Legends are collected into a single zip archive.  
+

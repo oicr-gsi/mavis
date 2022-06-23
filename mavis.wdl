@@ -270,10 +270,18 @@ task runMavis {
           sleep 5
       done
       if [ -f summary/MAVIS-$jobID.COMPLETE ]; then
-          zip -qj ~{prefix}".mavis_drawings.zip" *~{sid}\_diseased_*/annotate/*/drawings/*svg \
-                                                *~{sid}\_diseased_*/annotate/*/drawings/*json
-          ### there should be a single mavis_summary_all file
+          ### create an empty zip file, which will be updated with drawings and legends.  if there are none, than the empty file is provisioned out
+          echo | zip -q > ~{prefix}".mavis_drawings.zip" && zip -dq ~{prefix}".mavis_drawings.zip" -
+
+          ### find all drawing directories, recursively add the drawings
+          for draw_dir in `ls *~{sid}\_diseased_*/annotate/*/drawings`
+          do
+            zip -qjur ~{prefix}".mavis_drawings.zip" $draw_dir
+          done
+
+          ### there should be a single mavis_summary_all files
           cp summary/mavis_summary_all_*.tab ~{prefix}.mavis_summary.tab
+
           ### non-synonymous coding variants are separate into WG or WT files; each may or may not be produced
           if [ -e summary/mavis_summary_WG.*_non-synonymous_coding_variants.tab ];then
             cp summary/mavis_summary_WG.*_non-synonymous_coding_variants.tab ~{prefix}.WG_non-synonymous_coding_variants.tab
