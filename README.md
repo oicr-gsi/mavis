@@ -84,9 +84,9 @@ Output | Type | Description
  
  OPTIONAL : Filter Delly files to keep ONLY the PASS calls
  
- <<<
+ ```
      bcftools view -i "%FILTER='PASS'" ~{svFile} -Oz -o ~{svFileBase}.pass.vcf.gz
- >>>
+ ```
  
  
  Setup Mavis : Inline python code
