@@ -83,6 +83,7 @@ Output | Type | Description
  
  
  OPTIONAL : Filter Delly files to keep ONLY the PASS calls
+ 
  <<<
      bcftools view -i "%FILTER='PASS'" ~{svFile} -Oz -o ~{svFileBase}.pass.vcf.gz
  >>>
@@ -90,7 +91,7 @@ Output | Type | Description
  
  Setup Mavis : Inline python code
  
- <<<
+ ```
      unset LD_LIBRARY_PATH
      unset LD_LIBRARY_PATH_modshare
      export MAVIS_REFERENCE_GENOME=~{referenceGenome}
@@ -152,7 +153,7 @@ Output | Type | Description
      f.write("--write ~{outputCONFIG}\n")
      f.close()
      CODE
- <<<
+ ```
  
  Run Mavis : Inline bash code.  Drawings and legends are compiled in a zip archive.
  >>>
