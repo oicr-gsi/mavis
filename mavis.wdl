@@ -271,12 +271,12 @@ task runMavis {
       done
       if [ -f summary/MAVIS-$jobID.COMPLETE ]; then
           ### create an empty zip file, which will be updated with drawings and legends.  if there are none, than the empty file is provisioned out
-          echo | zip -q > ~{prefix}".mavis_drawings.zip" && zip -dq ~{prefix}".mavis_drawings.zip" -
+          echo | zip -q > ~{prefix}.mavis_drawings.zip && zip -dq ~{prefix}.mavis_drawings.zip -
 
           ### find all drawing directories, recursively add the drawings
-          for draw_dir in `ls *~{sid}\_diseased_*/annotate/*/drawings`
+          for draw_dir in `ls -d *~{sid}\_diseased_*/annotate/*/drawings`
           do
-            zip -qjur ~{prefix}".mavis_drawings.zip" $draw_dir
+            zip -qjur ~{prefix}.mavis_drawings.zip $draw_dir
           done
 
           ### there should be a single mavis_summary_all files
