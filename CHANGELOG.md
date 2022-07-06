@@ -1,4 +1,6 @@
-## 3.0,1 - 2022-06-21
+## 3.0.2 - 2022-07-06
+-  Niassa versin of 3.0.1
+## 3.0.1 - 2022-06-21
 - Added tasks to do filtering of delly files.  Input struct has an optional boolean variable called doFilter.  if set to true for a delly file, then delly input will be filtered to keep only PASS calls..  Setting this flag for other SV types is currently not supported and will be ignored 
 ## 3.0 - 2022-05-05
 - Reversion to the 1.2 WDL, running as a single task. The rewrite in version 2.0 was designed to implement parallelization for large data that runs long. There were issues in the workflow that needed correction.  The current approach, as implemented for Marathon of Hope projects will used the simple single task workflow but limit the amount of data that can be processed. 
