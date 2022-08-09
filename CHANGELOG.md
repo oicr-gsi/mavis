@@ -1,3 +1,10 @@
+## 3.0,1 - 2022-06-21
+- Added tasks to do filtering of delly files.  Input struct has an optional boolean variable called doFilter.  if set to true for a delly file, then delly input will be filtered to keep only PASS calls..  Setting this flag for other SV types is currently not supported and will be ignored 
+## 3.0 - 2022-05-05
+- Reversion to the 1.2 WDL, running as a single task. The rewrite in version 2.0 was designed to implement parallelization for large data that runs long. There were issues in the workflow that needed correction.  The current approach, as implemented for Marathon of Hope projects will used the simple single task workflow but limit the amount of data that can be processed. 
+- Donor argument changed to SampleId.  The values given are a sample indicator, NOT a donor id
+- Sample id needs to be provided to the mavis tool in a sanitized form to remove reserved charactes (eg. _ ).  The workflow however also uses this in final naming of the output.  A prefix argument is now included in the runMavis task which takes the provided SampleId without sanitization, and this is used for file naming
+- Outputs were collected into arrays/globs.  This didn't appear to be necessary, and has been modified now so that the output is a) a single tab delimited file with mavis calls and b) a single zip of all the drawings
 ## 2.0.1 - 2021-05-28
 - Migrating to Vidarr
 - Fixing issues with starFusion, bringing back runtime section for zip task

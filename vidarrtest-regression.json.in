@@ -1,28 +1,12 @@
 [
     {
         "arguments": {
-            "mavis.annotate.jobMemory": null,
-            "mavis.annotate.modules": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13",
-            "mavis.annotate.timeout": null,
-            "mavis.config.alignerReference": "$HG19_MAVIS_ROOT/hg19.2bit",
-            "mavis.config.annotations": "$HG19_MAVIS_ROOT/ensembl69_hg19_annotations_with_ncrna.json",
-            "mavis.config.dgvAnnotations": "$HG19_MAVIS_ROOT/dgv_hg19_variants.tab",
-            "mavis.config.jobMemory": null,
-            "mavis.config.masking": "$HG19_MAVIS_ROOT/hg19_masking.tab",
-            "mavis.config.modules": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13",
-            "mavis.config.referenceGenome": "$HG19_ROOT/hg19_random.fa",
-            "mavis.config.templateMetadata": "$HG19_MAVIS_ROOT/cytoBand.txt",
-            "mavis.config.timeout": null,
-            "mavis.donor": "EPT0068",
-            "mavis.generateConfigScript.arribaConverter": "$MAVIS_CONFIG_ROOT/bin/parse_arriba.py",
-            "mavis.generateConfigScript.jobMemory": 12,
-            "mavis.generateConfigScript.modules": "python/3.6",
-            "mavis.generateConfigScript.timeout": 40,
+            "mavis.sampleId": "EPT0068",
             "mavis.inputBAMs": [
                 {
                     "bam": {
                         "contents": {
-                            "configuration": "/.mounts/labs/gsi/testdata/mavis/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.Aligned.sortedByCoord.out_chr11.bam",
+                            "configuration": "/.mounts/labs/gsi/testdata/mavis/EPT0068_CHR11_DOWNSAMPLED/input_data/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.Aligned.sortedByCoord.out_chr11.bam",
                             "externalIds": [
                                 {
                                     "id": "TEST",
@@ -34,7 +18,7 @@
                     },
                     "bamIndex": {
                         "contents": {
-                            "configuration": "/.mounts/labs/gsi/testdata/mavis/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.Aligned.sortedByCoord.out_chr11.bam.bai",
+                            "configuration": "/.mounts/labs/gsi/testdata/mavis/EPT0068_CHR11_DOWNSAMPLED/input_data/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.Aligned.sortedByCoord.out_chr11.bam.bai",
                             "externalIds": [
                                 {
                                     "id": "TEST",
@@ -47,28 +31,12 @@
                     "libraryDesign": "WT"
                 }
             ],
-            "mavis.libTypeMap": null,
-            "mavis.pairing.jobMemory": null,
-            "mavis.pairing.modules": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13",
-            "mavis.pairing.timeout": null,
-            "mavis.setup.drawNonSynonymousCdnaOnly": null,
-            "mavis.setup.jobMemory": null,
-            "mavis.setup.mavisAligner": null,
-            "mavis.setup.mavisDrawFusionOnly": null,
-            "mavis.setup.mavisMaxFiles": null,
-            "mavis.setup.mavisUninformativeFilter": null,
-            "mavis.setup.minClusterPerFile": null,
-            "mavis.setup.modules": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13",
-            "mavis.setup.timeout": null,
-            "mavis.summary.jobMemory": null,
-            "mavis.summary.modules": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13",
-            "mavis.summary.timeout": null,
             "mavis.svData": [
                 {
                     "libraryDesign": "WT",
                     "svFile": {
                         "contents": {
-                            "configuration": "/.mounts/labs/gsi/testdata/mavis/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.star-fusion.fusion_predictions.abridged_chr11.tsv",
+                            "configuration": "/.mounts/labs/gsi/testdata/mavis/EPT0068_CHR11_DOWNSAMPLED/input_data/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.star-fusion.fusion_predictions.abridged_chr11.tsv",
                             "externalIds": [
                                 {
                                     "id": "TEST",
@@ -78,15 +46,47 @@
                         },
                         "type": "EXTERNAL"
                     },
-                    "workflowName": "StarFusion"
+                    "workflowName": "StarFusion",
+                    "doFilter": false
                 }
             ],
-            "mavis.validate.jobMemory": null,
-            "mavis.validate.modules": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13",
-            "mavis.validate.timeout": null,
-            "mavis.zipResults.jobMemory": null,
-            "mavis.zipResults.modules": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13",
-            "mavis.zipResults.timeout": null
+            "mavis.filterDellyInput.svFile": null,
+            "mavis.filterDellyInput.modules": "bcftools",
+            "mavis.filterDellyInput.jobMemory": null,
+            "mavis.filterDellyInput.timeout": null,
+            "mavis.filterDellyInput.svFileBase": null,
+            "mavis.runMavis.inputBAMs": null,
+            "mavis.runMavis.inputBAMidx": null,
+            "mavis.runMavis.libTypes": null,
+            "mavis.runMavis.svData": null,
+            "mavis.runMavis.svWorkflows": null,
+            "mavis.runMavis.svLibDesigns": null,
+            "mavis.runMavis.outputCONFIG": null,
+            "mavis.runMavis.scriptName": null,
+            "mavis.runMavis.arribaConverter": "$MAVIS_CONFIG_ROOT/bin/parse_arriba.py",
+            "mavis.runMavis.sid": null,
+            "mavis.runMavis.prefix": null,
+            "mavis.runMavis.referenceGenome": "$HG19_ROOT/hg19_random.fa",
+            "mavis.runMavis.annotations": "$HG19_MAVIS_ROOT/ensembl69_hg19_annotations_with_ncrna.json",
+            "mavis.runMavis.masking": "$HG19_MAVIS_ROOT/hg19_masking.tab",
+            "mavis.runMavis.dvgAnnotations": "$HG19_MAVIS_ROOT/dgv_hg19_variants.tab",
+            "mavis.runMavis.alignerReference": "$HG19_MAVIS_ROOT/hg19.2bit",
+            "mavis.runMavis.templateMetadata": "$HG19_MAVIS_ROOT/cytoBand.txt",
+            "mavis.runMavis.mavisAligner": null,
+            "mavis.runMavis.mavisScheduler": null,
+            "mavis.runMavis.mavisDrawFusionOnly": null,
+            "mavis.runMavis.mavisAnnotationMemory": 64000,
+            "mavis.runMavis.mavisValidationMemory": 64000,
+            "mavis.runMavis.mavisTransValidationMemory": 64000,
+            "mavis.runMavis.mavisMemoryLimit": 64000,
+            "mavis.runMavis.minClusterPerFile": 5,
+            "mavis.runMavis.drawNonSynonymousCdnaOnly": "False",
+            "mavis.runMavis.mavisUninformativeFilter": "True",
+            "mavis.runMavis.modules": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13",
+            "mavis.runMavis.jobMemory": null,
+            "mavis.runMavis.sleepInterval": 20,
+            "mavis.runMavis.timeout": 72,
+            "mavis.runMavis.mavisMaxTime": null
         },
         "description": "MAVIS workflow test",
         "engineArguments": {
@@ -95,7 +95,31 @@
         },
         "id": "EPT0068_CHR11_DOWNSAMPLED",
         "metadata": {
-            "mavis.results": {
+            "mavis.summary": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_mavis_EPT0068_CHR11_DOWNSAMPLED_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "mavis.drawings": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_mavis_EPT0068_CHR11_DOWNSAMPLED_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "mavis.nscvWT": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_mavis_EPT0068_CHR11_DOWNSAMPLED_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "mavis.nscvWG": {
                 "contents": [
                     {
                         "outputDirectory": "@SCRATCH@/@DATE@_Workflow_mavis_EPT0068_CHR11_DOWNSAMPLED_@JENKINSID@"
@@ -108,7 +132,7 @@
             {
                 "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
                 "metrics_compare": "@CHECKOUT@/tests/compare.sh",
-                "output_metrics": "/.mounts/labs/gsi/testdata/mavis/output_metrics/EPT0068_CHR11_DOWNSAMPLED.metrics",
+                "output_metrics": "/.mounts/labs/gsi/testdata/mavis/EPT0068_CHR11_DOWNSAMPLED/output_expectation/metrics/EPT0068_CHR11_DOWNSAMPLED.metrics.txt",
                 "type": "script"
             }
         ]
