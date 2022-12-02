@@ -17,10 +17,10 @@ workflow mavis {
   
   String filter_modules = "bcftools/1.9"
   if (reference == "hg19") {
-      String mavis_hg19_modules = "mavis/2.2.6 mavis-config/1.2 hg38-mavis/2.2.6 hg38/p12"
+      String mavis_hg19_modules = "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13"
   }
   if (reference == "hg38") {
-      String mavis_hg38_modules = "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13"
+      String mavis_hg38_modules = "mavis/2.2.6 mavis-config/1.2 hg38-mavis/2.2.6 hg38/p12"
   }
   String mavis_modules = select_first([mavis_hg19_modules,mavis_hg38_modules])
 
