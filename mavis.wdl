@@ -5,7 +5,24 @@ workflow mavis {
     String sampleId
     Array[BamData] inputBAMs
     Array[SvData] svData
+	String reference
   }
+
+  parameter_meta {
+    sampleId: "sample identifier, which will be used for final naming of output files"
+    inputBAMs: "Collection of alignment files with indexes and metadata"
+    svData: "Collection of SV calls with metadata"
+	reference: "The genome reference build. for example: hg19, hg38"
+  }
+  
+  String filter_modules = "bcftools/1.9"
+  if (reference == "hg19") {
+      String mavis_hg19_modules = "mavis/2.2.6 mavis-config/1.2 hg38-mavis/2.2.6 hg38/p12"
+  }
+  if (reference == "hg38") {
+      String mavis_hg38_modules = "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13"
+  }
+  String mavis_modules = select_first([mavis_hg19_modules,mavis_hg38_modules])
 
   String sanitized_sid = sub(sampleId, "_", ".")
 
@@ -20,6 +37,7 @@ workflow mavis {
       call filterDellyInput {
         input:
           svFile = s.svFile,
+          modules = filter_modules
       }
     }
     File svFiles = select_first([filterDellyInput.fsvFile,s.svFile])
@@ -36,7 +54,8 @@ workflow mavis {
       libTypes = bamLibraryDesigns,
       svData = svFiles,
       svWorkflows = workflowNames,
-      svLibDesigns = svLibraryDesigns
+      svLibDesigns = svLibraryDesigns,
+	  modules = mavis_modules
   }
 
   meta {
@@ -47,6 +66,10 @@ workflow mavis {
       {
         name: "mavis/2.2.6",
         url: "http://mavis.bcgsc.ca/"
+      },
+      {
+        name: "bcftools/1.9 ",
+        url: "https://samtools.github.io/bcftools/bcftools.html"
       }
     ]
     output_meta: {
@@ -57,11 +80,7 @@ workflow mavis {
     }
   }
 
-  parameter_meta {
-    sampleId: "sample identifier, which will be used for final naming of output files"
-    inputBAMs: "Collection of alignment files with indexes and metadata"
-    svData: "Collection of SV calls with metadata"
-  }
+
 
   output {
     File summary = runMavis.summary
