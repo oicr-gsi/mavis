@@ -28,7 +28,7 @@ workflow mavis {
   "hg38_masking": "$HG38_MAVIS_ROOT/hg38_masking.tab",
   "hg38_referenceGenome": "$HG38_ROOT/hg38_random.fa",
   "hg38_alignerReference": "$HG38_MAVIS_ROOT/hg38.2bit",
-  "hg19_annotations": "$HG19_MAVIS_ROOT/ensembl79_hg19_annotations.json", 
+  "hg19_annotations": "$HG19_MAVIS_ROOT/ensembl69_hg19_annotations_with_ncrna.json", 
   "hg19_dvgAnnotations": "$HG19_MAVIS_ROOT/dgv_hg19_variants.tab",
   "hg19_cytoband": "$HG19_MAVIS_ROOT/cytoBand.txt",
   "hg19_masking": "$HG19_MAVIS_ROOT/hg19_masking.tab",
