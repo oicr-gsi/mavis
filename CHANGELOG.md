@@ -1,3 +1,5 @@
+## 3.0.3 - 2022-12-14
+- corrected default value for UniformativeFiler from False to True
 ## 3.0.2 - 2022-12-13
 - Modified so that all modules for specific software versions are indicated in the WDL file.  Added argument to identify the genome used for analysis.   Added variables to define modules and resource files based on the provided genome version.    
 ## 3.0.1 - 2022-06-21
