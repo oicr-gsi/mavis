@@ -53,7 +53,7 @@ Parameter|Value|Default|Description
 `runMavis.mavisMemoryLimit`|Int|32000|Max Memory allocated for MAVIS
 `runMavis.minClusterPerFile`|Int|10|Determines the way parallel calculations are organized 
 `runMavis.drawNonSynonymousCdnaOnly`|String|"False"|flag for MAVIS visualization control
-`runMavis.mavisUninformativeFilter`|String|"False"|Should be enabled if used is only interested in events inside genes, speeds up calculations
+`runMavis.mavisUninformativeFilter`|String|"True"|Should be enabled if used is only interested in events inside genes, speeds up calculations
 `runMavis.jobMemory`|Int|12|Memory allocated for this job
 `runMavis.sleepInterval`|Int|20|A pause after scheduling step, in seconds
 `runMavis.timeout`|Int|24|Timeout in hours, needed to override imposed limits
