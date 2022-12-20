@@ -112,11 +112,11 @@ workflow mavis {
         url: "https://gitlab.oicr.on.ca/ResearchIT/modulator"
       },
       { 
-        name: "hg38 modules : hg38-mavis-2.2.6 hg38-p12",
+        name: "gsi hg38 modules : hg38-mavis-2.2.6 hg38-p12",
         url: "https://gitlab.oicr.on.ca/ResearchIT/modulator"
       },
       {
-        name: "hg19 modules : hg19-mavis-2.2.6 hg19-p13",
+        name: "gsi hg19 modules : hg19-mavis-2.2.6 hg19-p13",
         url: "https://gitlab.oicr.on.ca/ResearchIT/modulator"
       }
     ]
