@@ -108,15 +108,15 @@ workflow mavis {
         url: "https://samtools.github.io/bcftools/bcftools.html"
       },
       { 
-        name: "gsi software modules : mavis/2.2.6 mavis-config/1.2 bcftools/1.9",
+        name: "gsi software modules : mavis-2.2.6 mavis-config-1.2 bcftools-1.9",
         url: "https://gitlab.oicr.on.ca/ResearchIT/modulator"
       },
       { 
-        name: "hg38 modules : hg38-mavis/2.2.6 hg38/p12",
+        name: "hg38 modules : hg38-mavis-2.2.6 hg38-p12",
         url: "https://gitlab.oicr.on.ca/ResearchIT/modulator"
       },
       {
-        name: "hg19 modules : hg19-mavis/2.2.6 hg19/p13",
+        name: "hg19 modules : hg19-mavis-2.2.6 hg19-p13",
         url: "https://gitlab.oicr.on.ca/ResearchIT/modulator"
       }
     ]

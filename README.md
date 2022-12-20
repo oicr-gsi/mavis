@@ -8,9 +8,9 @@ MAVIS workflow, annotation of structural variants. An application framework for 
 
 * [mavis v2.2.6](http://mavis.bcgsc.ca/)
 * [bcftools v1.9](https://samtools.github.io/bcftools/bcftools.html)
-* [gsi software modules : mavis 2.2.6 mavis-config 1.2 bcftools 1.9](https://gitlab.oicr.on.ca/ResearchIT/modulator)
-* [hg38 modules : hg38-mavis 2.2.6 hg38 p12](https://gitlab.oicr.on.ca/ResearchIT/modulator)
-* [hg19 modules : hg19-mavis 2.2.6 hg19 p13](https://gitlab.oicr.on.ca/ResearchIT/modulator)
+* [gsi software modules : mavis-2.2.6 mavis-config-1.2 bcftools-1.9](https://gitlab.oicr.on.ca/ResearchIT/modulator)
+* [hg38 modules : hg38-mavis-2.2.6 hg38-p12](https://gitlab.oicr.on.ca/ResearchIT/modulator)
+* [hg19 modules : hg19-mavis-2.2.6 hg19-p13](https://gitlab.oicr.on.ca/ResearchIT/modulator)
 
 
 ## Usage
