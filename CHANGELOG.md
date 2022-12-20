@@ -1,3 +1,5 @@
+## 3.0.4 - 2022-12-20
+- improved organization of genome resources into a map (key = reference build) pointing to a struct of associated files and modules
 ## 3.0.3 - 2022-12-14
 - corrected default value for UniformativeFiler from False to True
 ## 3.0.2 - 2022-12-13
