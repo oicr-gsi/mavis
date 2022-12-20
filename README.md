@@ -6,7 +6,11 @@ MAVIS workflow, annotation of structural variants. An application framework for 
 
 ## Dependencies
 
-* [mavis 2.2.6](http://mavis.bcgsc.ca/)
+* [mavis v2.2.6](http://mavis.bcgsc.ca/)
+* [bcftools v1.9](https://samtools.github.io/bcftools/bcftools.html)
+* [gsi software modules : mavis 2.2.6 mavis-config 1.2 bcftools 1.9](https://gitlab.oicr.on.ca/ResearchIT/modulator)
+* [hg38 modules : hg38-mavis 2.2.6 hg38 p12](https://gitlab.oicr.on.ca/ResearchIT/modulator)
+* [hg19 modules : hg19-mavis 2.2.6 hg19 p13](https://gitlab.oicr.on.ca/ResearchIT/modulator)
 
 
 ## Usage
@@ -22,17 +26,9 @@ java -jar cromwell.jar run mavis.wdl --inputs inputs.json
 Parameter|Value|Description
 ---|---|---
 `sampleId`|String|sample identifier, which will be used for final naming of output files
-`inputBAMs`|Array[BamData]|Collection of alignment files with indexes and metadata
-`svData`|Array[SvData]|Collection of SV calls with metadata
-`filterDellyInput.modules`|String|modules needed to run filtering
-`runMavis.arribaConverter`|String|path to arriba conversion script
-`runMavis.referenceGenome`|String|path to fasta file with genomic assembly
-`runMavis.annotations`|String|.json file with annotations for MAVIS
-`runMavis.masking`|String|masking data in .tab format
-`runMavis.dvgAnnotations`|String|The DGV annotations help to deal with variants found in normal tissue
-`runMavis.alignerReference`|String|References in 2bit (compressed) format, used by MAVIS aligner
-`runMavis.templateMetadata`|String|Chromosome Band Information, used for visualization
-`runMavis.modules`|String|modules needed to run MAVIS
+`inputBAMs`|Array[BamData]|Collection of alignment files with indexes and library type
+`svData`|Array[SvData]|Collection of SV calls with caller name, library type, and filter flag
+`reference`|String|The genome reference build. for example: hg19, hg38
 
 
 #### Optional workflow parameters:

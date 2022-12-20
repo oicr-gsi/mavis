@@ -23,8 +23,8 @@ workflow mavis {
 
   parameter_meta {
     sampleId: "sample identifier, which will be used for final naming of output files"
-    inputBAMs: "Collection of alignment files with indexes and metadata"
-    svData: "Collection of SV calls with metadata"
+    inputBAMs: "Collection of alignment files with indexes and library type"
+    svData: "Collection of SV calls with caller name, library type, and filter flag"
 	reference: "The genome reference build. for example: hg19, hg38"
   }
   
@@ -100,12 +100,24 @@ workflow mavis {
    description: "MAVIS workflow, annotation of structural variants. An application framework for the rapid generation of structural variant consensus, able to visualize the genetic impact and context as well as process both genome and transcriptome data."
    dependencies: [
       {
-        name: "mavis/2.2.6",
+        name: "mavis v2.2.6",
         url: "http://mavis.bcgsc.ca/"
       },
       {
-        name: "bcftools/1.9 ",
+        name: "bcftools v1.9",
         url: "https://samtools.github.io/bcftools/bcftools.html"
+      },
+      { 
+        name: "gsi software modules : mavis/2.2.6 mavis-config/1.2 bcftools/1.9",
+        url: "https://gitlab.oicr.on.ca/ResearchIT/modulator"
+      },
+      { 
+        name: "hg38 modules : hg38-mavis/2.2.6 hg38/p12",
+        url: "https://gitlab.oicr.on.ca/ResearchIT/modulator"
+      },
+      {
+        name: "hg19 modules : hg19-mavis/2.2.6 hg19/p13",
+        url: "https://gitlab.oicr.on.ca/ResearchIT/modulator"
       }
     ]
     output_meta: {
