@@ -1,5 +1,18 @@
 version 1.0
 
+
+struct GenomeResources {
+    String modules
+    String annotations
+    String dvgAnnotations
+    String cytoband
+    String masking
+    String referenceGenome
+    String alignerReference
+}
+
+
+
 workflow mavis {
   input {
     String sampleId
@@ -18,25 +31,27 @@ workflow mavis {
   
   String filter_modules = "bcftools/1.9"
   
-  Map[String,String] mavis_modules_by_genome = { "hg19": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13", "hg38" : "mavis/2.2.6 mavis-config/1.2 hg38-mavis/2.2.6 hg38/p12" }
-  String mavis_modules = mavis_modules_by_genome [ reference ]
-  
-  Map[String,String] resources = { 
-  "hg38_annotations": "$HG38_MAVIS_ROOT/ensembl79_hg38_annotations.json", 
-  "hg38_dvgAnnotations": "$HG38_MAVIS_ROOT/dgv_hg38_variants.tab",
-  "hg38_cytoband": "$HG38_MAVIS_ROOT/cytoBand.txt",
-  "hg38_masking": "$HG38_MAVIS_ROOT/hg38_masking.tab",
-  "hg38_referenceGenome": "$HG38_ROOT/hg38_random.fa",
-  "hg38_alignerReference": "$HG38_MAVIS_ROOT/hg38.2bit",
-  "hg19_annotations": "$HG19_MAVIS_ROOT/ensembl69_hg19_annotations_with_ncrna.json", 
-  "hg19_dvgAnnotations": "$HG19_MAVIS_ROOT/dgv_hg19_variants.tab",
-  "hg19_cytoband": "$HG19_MAVIS_ROOT/cytoBand.txt",
-  "hg19_masking": "$HG19_MAVIS_ROOT/hg19_masking.tab",
-  "hg19_referenceGenome": "$HG19_ROOT/hg19_random.fa",
-  "hg19_alignerReference": "$HG19_MAVIS_ROOT/hg19.2bit"
- }
+  Map[String,GenomeResources] resources = {
+  "hg38": {
+    "modules":          "mavis/2.2.6 mavis-config/1.2 hg38-mavis/2.2.6 hg38/p12",
+    "annotations":      "$HG38_MAVIS_ROOT/ensembl79_hg38_annotations.json", 
+    "dvgAnnotations":   "$HG38_MAVIS_ROOT/dgv_hg38_variants.tab",
+    "cytoband":         "$HG38_MAVIS_ROOT/cytoBand.txt",
+    "masking":          "$HG38_MAVIS_ROOT/hg38_masking.tab",
+    "referenceGenome":  "$HG38_ROOT/hg38_random.fa",
+    "alignerReference": "$HG38_MAVIS_ROOT/hg38.2bit"
+  },
+  "hg19": {
+    "modules":          "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13",
+    "annotations":      "$HG19_MAVIS_ROOT/ensembl69_hg19_annotations_with_ncrna.json", 
+    "dvgAnnotations":   "$HG19_MAVIS_ROOT/dgv_hg19_variants.tab",
+    "cytoband":         "$HG19_MAVIS_ROOT/cytoBand.txt",
+    "masking":          "$HG19_MAVIS_ROOT/hg19_masking.tab",
+    "referenceGenome":  "$HG19_ROOT/hg19_random.fa",
+    "alignerReference": "$HG19_MAVIS_ROOT/hg19.2bit"
+  }}
 
-  String build_annotations = resources [ "~{reference + '_annotations'}" ]
+  
 
   String sanitized_sid = sub(sampleId, "_", ".")
 
@@ -69,13 +84,13 @@ workflow mavis {
       svData = svFiles,
       svWorkflows = workflowNames,
       svLibDesigns = svLibraryDesigns,
-      modules = mavis_modules,
-      annotations       = resources [ "~{reference + '_annotations'}" ],
-      dvgAnnotations    = resources [ "~{reference + '_dvgAnnotations'}" ],
-      templateMetadata  = resources [ "~{reference + '_cytoband'}" ],
-      masking           = resources [ "~{reference + '_masking'}" ],
-      referenceGenome   = resources [ "~{reference + '_referenceGenome'}" ],
-      alignerReference  = resources [ "~{reference + '_alignerReference'}" ],
+      modules           = resources [ reference ].modules,
+      annotations       = resources [ reference ].annotations,
+      dvgAnnotations    = resources [ reference ].dvgAnnotations,
+      templateMetadata  = resources [ reference ].cytoband,
+      masking           = resources [ reference ].masking,
+      referenceGenome   = resources [ reference ].referenceGenome,
+      alignerReference  = resources [ reference ].alignerReference,
       arribaConverter   = "$MAVIS_CONFIG_ROOT/bin/parse_arriba.py"
   }
 
@@ -181,7 +196,7 @@ task runMavis {
     Int mavisMemoryLimit = 32000
     Int minClusterPerFile = 10
     String drawNonSynonymousCdnaOnly = "False"
-    String mavisUninformativeFilter = "True"
+    String mavisUninformativeFilter = "False"
     String modules
     Int jobMemory = 12
     Int sleepInterval = 20
