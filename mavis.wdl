@@ -179,6 +179,7 @@ task runMavis {
     Int mavisValidationMemory = 32000
     Int mavisTransValidationMemory = 32000
     Int mavisMemoryLimit = 32000
+    String mavisQueue = "u20.q"
     Int minClusterPerFile = 10
     String drawNonSynonymousCdnaOnly = "False"
     String mavisUninformativeFilter = "True"
@@ -214,6 +215,7 @@ task runMavis {
     mavisValidationMemory: "Memory allocated for validation step"
     mavisTransValidationMemory: "Memory allocated for transvalidation step"
     mavisMemoryLimit: "Max Memory allocated for MAVIS"
+    mavisQueue: "the mavis job queue"
     minClusterPerFile: "Determines the way parallel calculations are organized "
     drawNonSynonymousCdnaOnly: "flag for MAVIS visualization control"
     mavisUninformativeFilter: "Should be enabled if used is only interested in events inside genes, speeds up calculations"
@@ -225,8 +227,7 @@ task runMavis {
   }
 
   command <<<
-    unset LD_LIBRARY_PATH
-    unset LD_LIBRARY_PATH_modshare
+ 
     export MAVIS_REFERENCE_GENOME=~{referenceGenome}
     export MAVIS_ANNOTATIONS=~{annotations}
     export MAVIS_MASKING=~{masking}
@@ -234,7 +235,8 @@ task runMavis {
     export MAVIS_ALIGNER_REFERENCE=~{alignerReference}
     export MAVIS_TEMPLATE_METADATA=~{templateMetadata}
     export MAVIS_TIME_LIMIT=~{mavisMaxTime}
-    python <<CODE
+    # we're using system python3
+    python3 <<CODE
 
     libtypes = {'WT': "transcriptome", 'MR': "transcriptome", 'WG': "genome"}
     wfMappings = {'StructuralVariation': 'delly', 'delly': 'delly', 'arriba' : 'arriba', 'StarFusion': 'starfusion', 'manta': 'manta'}
@@ -298,6 +300,7 @@ task runMavis {
     export DRAW_NON_SYNONYMOUS_CDNA_ONLY=~{drawNonSynonymousCdnaOnly}
     export min_clusters_per_file=~{minClusterPerFile}
     export MAVIS_UNINFORMATIVE_FILTER=~{mavisUninformativeFilter}
+    export MAVIS_QUEUE=~{mavisQueue}
     mavis setup ~{outputCONFIG} -o .
     BATCHID=$(grep MS_batch build.cfg | grep -v \] | sed s/.*-// | tail -n 1)
     mavis schedule -o . --submit 2> >(tee launch_stderr.log)

@@ -1,3 +1,5 @@
+## 3.0.4 - 2023-06-01
+- add parameter mavisQueue, modified for Ubuntu 20
 ## 3.0.2 - 2022-12-13
 - Modified so that all modules for specific software versions are indicated in the WDL file.  Added argument to identify the genome used for analysis.   Added variables to define modules and resource files based on the provided genome version.    
 ## 3.0.1 - 2022-06-21
