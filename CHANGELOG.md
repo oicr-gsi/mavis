@@ -1,3 +1,5 @@
+## 3.1.0 - 2023-07-18
+- add bin parameters to improve the raliability of config file creation
 ## 3.0.4 - 2023-06-01
 - add parameter mavisQueue, modified for Ubuntu 20
 ## 3.0.2 - 2022-12-13
