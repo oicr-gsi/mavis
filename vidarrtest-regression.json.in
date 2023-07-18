@@ -46,7 +46,7 @@
                         },
                         "type": "EXTERNAL"
                     },
-                    "workflowName": "StarFusion",
+                    "workflowName": "starFusion",
                     "doFilter": false
                 }
             ],
