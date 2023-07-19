@@ -89,7 +89,7 @@
             "mavis.runMavis.timeout": 72,
             "mavis.runMavis.maxBins": null,
             "mavis.runMavis.mavisMaxTime": null,
-            "mavis.runMavis.mavisQueue": "u20.q"
+            "mavis.runMavis.mavisQueue": "all.q"
         },
         "description": "MAVIS workflow test",
         "engineArguments": {
