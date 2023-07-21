@@ -241,7 +241,7 @@ task runMavis {
     python3 <<CODE
 
     libtypes = {'WT': "transcriptome", 'MR': "transcriptome", 'WG': "genome"}
-    wfMappings = {'StructuralVariation': 'delly', 'delly': 'delly', 'arriba' : 'arriba', 'starFusion': 'starfusion', 'starfusion': 'starfusion', 'manta': 'manta'}
+    wfMappings = {'StructuralVariation': 'delly', 'delly': 'delly', 'arriba' : 'arriba', 'starFusion': 'starfusion', 'StarFusion': 'starfusion', 'starfusion': 'starfusion', 'manta': 'manta'}
 
     b = "~{sep=' ' inputBAMs}"
     bams = b.split()
