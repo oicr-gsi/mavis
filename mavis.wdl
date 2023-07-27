@@ -187,6 +187,7 @@ task runMavis {
     Int jobMemory = 12
     Int sleepInterval = 20
     Int timeout = 24
+    Int maxBins = 100000
     Int mavisMaxTime = timeout * 1800
   }
 
@@ -223,6 +224,7 @@ task runMavis {
     jobMemory: "Memory allocated for this job"
     sleepInterval: "A pause after scheduling step, in seconds"
     timeout: "Timeout in hours, needed to override imposed limits"
+    maxBins: "Maximum value for transcriptome_bins and genome_bins parameters, Default is 100000"
     mavisMaxTime: "Timeout for MAVIS tasks, in seconds. 1/2 of the timeout"
   }
 
@@ -239,7 +241,7 @@ task runMavis {
     python3 <<CODE
 
     libtypes = {'WT': "transcriptome", 'MR': "transcriptome", 'WG': "genome"}
-    wfMappings = {'StructuralVariation': 'delly', 'delly': 'delly', 'arriba' : 'arriba', 'StarFusion': 'starfusion', 'manta': 'manta'}
+    wfMappings = {'StructuralVariation': 'delly', 'delly': 'delly', 'arriba' : 'arriba', 'starFusion': 'starfusion', 'StarFusion': 'starfusion', 'starfusion': 'starfusion', 'manta': 'manta'}
 
     b = "~{sep=' ' inputBAMs}"
     bams = b.split()
@@ -252,44 +254,52 @@ task runMavis {
     sl = "~{sep=' ' svLibDesigns}"
     svlibs = sl.split()
 
-    library_lines = []
-    convert_lines = []
-    assign_lines = []
+    config_lines = []
     assign_arrays = {}
     for lt in libtypes.keys():
-     assign_arrays[lt] = []
+       assign_arrays[lt] = []
 
     for b in range(len(bams)):
-     flag = ('False' if libs[b] == 'WG' else 'True')
-     library_lines.append( "--library " + libs[b] + ".~{sid} " + libtypes[libs[b]] + " diseased " + flag + " " + bams[b] + " \\\\" )
+       flag = ('False' if libs[b] == 'WG' else 'True')
+       config_lines.append( "--library " + libs[b] + ".~{sid} " + libtypes[libs[b]] + " diseased " + flag + " " + bams[b] + " \\\\" )
 
 
     for s in range(len(svdata)):
-     for w in wfMappings.keys():
-         if w in wfs[s]:
+       for w in wfMappings.keys():
+          if w in wfs[s]:
              if w == 'arriba':
-                 convert_lines.append( "--external_conversion arriba \"~{arribaConverter}  " + svdata[s] + "\"" + " \\\\" )
+                config_lines.append( "--external_conversion arriba \"~{arribaConverter}  " + svdata[s] + "\"" + " \\\\" )
              else:
-                 convert_lines.append( "--convert " + wfMappings[w] + " " + svdata[s] + " " + wfMappings[w] + " \\\\" )
+                config_lines.append( "--convert " + wfMappings[w] + " " + svdata[s] + " " + wfMappings[w] + " \\\\" )
              assign_arrays[svlibs[s]].append(wfMappings[w])
 
     for b in range(len(bams)):
        if len(assign_arrays[libs[b]]) > 0:
-           separator = " "
-           tools = separator.join(assign_arrays[libs[b]])
-           assign_lines.append( "--assign " + libs[b] + ".~{sid} " + tools + " \\\\" )
+          separator = " "
+          tools = separator.join(assign_arrays[libs[b]])
+          config_lines.append( "--assign " + libs[b] + ".~{sid} " + tools + " \\\\" )
 
     f = open("~{scriptName}","w+")
     f.write("#!/bin/bash" + "\n\n")
     f.write('mavis config \\\\\n')
-    f.write('\n'.join(library_lines) + '\n')
-    f.write('\n'.join(convert_lines) + '\n')
-    f.write('\n'.join(assign_lines) + '\n')
+    f.write('\n'.join(config_lines) + '\n')
+    if "WT" in libs or "MR" in libs:
+       f.write("--transcriptome_bins 500" + ' \\\\\n')
+    if "WG" in libs:
+       f.write("--genome_bins 500" + ' \\\\\n')
     f.write("--write ~{outputCONFIG}\n")
     f.close()
     CODE
+    
     chmod +x ~{scriptName}
-    ./~{scriptName}
+    ./~{scriptName} &
+    wait
+    
+    if [ ! -f ~{outputCONFIG} ]; then
+      sed -i 's/_bins 500/_bins ~{maxBins}/' ~{scriptName}
+      ./~{scriptName}
+    fi
+
     export MAVIS_ALIGNER='~{mavisAligner}'
     export MAVIS_SCHEDULER=~{mavisScheduler}
     export MAVIS_DRAW_FUSIONS_ONLY=~{mavisDrawFusionOnly}

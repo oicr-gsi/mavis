@@ -7,6 +7,7 @@ MAVIS workflow, annotation of structural variants. An application framework for 
 ## Dependencies
 
 * [mavis 2.2.6](http://mavis.bcgsc.ca/)
+* [bcftools 1.9 ](https://samtools.github.io/bcftools/bcftools.html)
 
 
 ## Usage
@@ -24,15 +25,7 @@ Parameter|Value|Description
 `sampleId`|String|sample identifier, which will be used for final naming of output files
 `inputBAMs`|Array[BamData]|Collection of alignment files with indexes and metadata
 `svData`|Array[SvData]|Collection of SV calls with metadata
-`filterDellyInput.modules`|String|modules needed to run filtering
-`runMavis.arribaConverter`|String|path to arriba conversion script
-`runMavis.referenceGenome`|String|path to fasta file with genomic assembly
-`runMavis.annotations`|String|.json file with annotations for MAVIS
-`runMavis.masking`|String|masking data in .tab format
-`runMavis.dvgAnnotations`|String|The DGV annotations help to deal with variants found in normal tissue
-`runMavis.alignerReference`|String|References in 2bit (compressed) format, used by MAVIS aligner
-`runMavis.templateMetadata`|String|Chromosome Band Information, used for visualization
-`runMavis.modules`|String|modules needed to run MAVIS
+`reference`|String|The genome reference build. for example: hg19, hg38
 
 
 #### Optional workflow parameters:
@@ -55,12 +48,14 @@ Parameter|Value|Default|Description
 `runMavis.mavisValidationMemory`|Int|32000|Memory allocated for validation step
 `runMavis.mavisTransValidationMemory`|Int|32000|Memory allocated for transvalidation step
 `runMavis.mavisMemoryLimit`|Int|32000|Max Memory allocated for MAVIS
+`runMavis.mavisQueue`|String|"u20.q"|the mavis job queue
 `runMavis.minClusterPerFile`|Int|10|Determines the way parallel calculations are organized 
 `runMavis.drawNonSynonymousCdnaOnly`|String|"False"|flag for MAVIS visualization control
-`runMavis.mavisUninformativeFilter`|String|"False"|Should be enabled if used is only interested in events inside genes, speeds up calculations
+`runMavis.mavisUninformativeFilter`|String|"True"|Should be enabled if used is only interested in events inside genes, speeds up calculations
 `runMavis.jobMemory`|Int|12|Memory allocated for this job
 `runMavis.sleepInterval`|Int|20|A pause after scheduling step, in seconds
 `runMavis.timeout`|Int|24|Timeout in hours, needed to override imposed limits
+`runMavis.maxBins`|Int|100000|Maximum value for transcriptome_bins and genome_bins parameters, Default is 100000
 `runMavis.mavisMaxTime`|Int|timeout * 1800|Timeout for MAVIS tasks, in seconds. 1/2 of the timeout
 
 

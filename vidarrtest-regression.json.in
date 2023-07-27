@@ -46,7 +46,7 @@
                         },
                         "type": "EXTERNAL"
                     },
-                    "workflowName": "StarFusion",
+                    "workflowName": "starFusion",
                     "doFilter": false
                 }
             ],
@@ -87,8 +87,9 @@
             "mavis.runMavis.jobMemory": null,
             "mavis.runMavis.sleepInterval": 20,
             "mavis.runMavis.timeout": 72,
+            "mavis.runMavis.maxBins": null,
             "mavis.runMavis.mavisMaxTime": null,
-            "mavis.runMavis.mavisQueue": "u20.q"
+            "mavis.runMavis.mavisQueue": "all.q"
         },
         "description": "MAVIS workflow test",
         "engineArguments": {
