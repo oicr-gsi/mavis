@@ -1,3 +1,5 @@
+## 3.2.0 - 2024-06-25
+[GRD-797](https://jira.oicr.on.ca/browse/GRD-797) - add vidarr labels to outputs (changes to medata only)
 ## 3.1.0 - 2023-07-18
 - add bin parameters to improve the raliability of config file creation
 ## 3.0.4 - 2023-06-01
