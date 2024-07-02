@@ -61,32 +61,32 @@ Parameter|Value|Default|Description
 
 ### Outputs
 
-Output | Type | Description
----|---|---
-`summary`|File|File with copy number variants, native varscan format
-`drawings`|File|Plots generated with MAVIS, collected into a single tar.gz archive
-`nscvWT`|File?|Whole transcriptome non-synonymous coding variants. The output file is only generated if variants are found
-`nscvWG`|File?|Whole genome non-synonymous coding variants. The output file is only generated if variants are found
+Output | Type | Description | Labels
+---|---|---|---
+`summary`|File|File with copy number variants, native varscan format|vidarr_label: summary
+`drawings`|File|Plots generated with MAVIS, collected into a single tar.gz archive|vidarr_label: drawings
+`nscvWT`|File?|Whole transcriptome non-synonymous coding variants. The output file is only generated if variants are found|vidarr_label: nscvWT
+`nscvWG`|File?|Whole genome non-synonymous coding variants. The output file is only generated if variants are found|vidarr_label: nscvWG
 
 
 ## Commands
- This section lists command(s) run by WORKFLOW workflow
+This section lists command(s) run by WORKFLOW workflow
  
- * Running mavis
+* Running mavis
  
- MAVIS annotates structural variants for WG and WT experiments
+MAVIS annotates structural variants for WG and WT experiments
  
  
- OPTIONAL : Filter Delly files to keep ONLY the PASS calls
+### OPTIONAL : Filter Delly files to keep ONLY the PASS calls
  
- ```
+```
      bcftools view -i "%FILTER='PASS'" ~{svFile} -Oz -o ~{svFileBase}.pass.vcf.gz
- ```
+```
  
  
- Setup Mavis : Inline python code
+### Setup Mavis : Inline python code
  
- ```
+```
      unset LD_LIBRARY_PATH
      unset LD_LIBRARY_PATH_modshare
      export MAVIS_REFERENCE_GENOME=~{referenceGenome}
@@ -148,11 +148,11 @@ Output | Type | Description
      f.write("--write ~{outputCONFIG}\n")
      f.close()
      CODE
- ```
+```
  
- Run Mavis
+### Run Mavis
  
- ```
+```
      chmod +x ~{scriptName}
      ./~{scriptName}
      export MAVIS_ALIGNER='~{mavisAligner}'
@@ -168,11 +168,11 @@ Output | Type | Description
      mavis setup ~{outputCONFIG} -o .
      BATCHID=$(grep MS_batch build.cfg | grep -v \] | sed s/.*-// | tail -n 1)
      mavis schedule -o . --submit 2> >(tee launch_stderr.log)
- ```
+```
  
- Compile results.  Drawings and Legends are collected into a single zip archive.  
+Compile results.  Drawings and Legends are collected into a single zip archive.  
  
- ## Support
+## Support
 
 For support, please file an issue on the [Github project](https://github.com/oicr-gsi) or send an email to gsi@oicr.on.ca .
 
