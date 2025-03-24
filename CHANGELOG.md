@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Add parameter mavisQueue, modified for Ubuntu 20.
 
-## [3.0.2] - 2022-12-13
+## [Unreleased] - 2022-12-13
 ### Changed
 - Modified so that all modules for specific software versions are indicated in the WDL file.  
 
@@ -40,10 +40,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Migrating to Vidarr
 
-###Fixed
+### Fixed
 - Fixing issues with starFusion, bringing back runtime section for zip task
 - [GC-8726](https://jira.oicr.on.ca/browse/GC-8726)
 - [GDI-2051](https://jira.oicr.on.ca/browse/GDI-2051)
+
+## [1.0.0] - 2021-06-01
+### Changed
+- Migrate to Vidarr
 
 ## [2.0] - 2021-02-01
 ### Changed
@@ -62,19 +66,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added Arriba support, exposed `MAVIS_TIME_LIMIT` env. variable for better control of the timeout for steps in MAVIS pipeline.
 
-## [1.0.4] - 2020-05-14
+## [Unreleased] - 2020-05-14
 ### Added
 - Added timeout parameter.
 
-## [1.0.3] - 2020-02-12
+## [Unreleased] - 2020-02-12
 ### Fixed
 - [GBS-1766](https://jira.oicr.on.ca/browse/GBS-1766) - Fix issue with cromwell not localizing related files as expected.
 
-## [1.0.2] - 2020-02-03
+## [Unreleased] - 2020-02-03
 ### Changed
 - Made zipped outputs optional (for cases when PASS SVs are not available the output will be nulls).
 
-## [1.0.1] - 2019-12-20
+## [Unreleased] - 2019-12-20
 ### Changed
  - Incremented version to avoid possible collision with older version.
 
