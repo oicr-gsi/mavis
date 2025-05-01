@@ -18,11 +18,11 @@ workflow mavis {
   
   String filter_modules = "bcftools/1.9"
   
-  Map[String,String] mavis_modules_by_genome = { "hg19": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13", "hg38" : "mavis/2.2.6 mavis-config/1.2 hg38-mavis/2.2.6 hg38/p12" }
+  Map[String,String] mavis_modules_by_genome = { "hg19": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13", "hg38" : "mavis/2.2.6 mavis-config/1.2 hg38v110-mavis/2.2.6 hg38/p12" }
   String mavis_modules = mavis_modules_by_genome [ reference ]
   
   Map[String,String] resources = { 
-  "hg38_annotations": "$HG38_MAVIS_ROOT/ensembl79_hg38_annotations.json", 
+  "hg38_annotations": "$HG38V110_MAVIS_ROOT/ensembl_v110_hg38_annotations.json", 
   "hg38_dvgAnnotations": "$HG38_MAVIS_ROOT/dgv_hg38_variants.tab",
   "hg38_cytoband": "$HG38_MAVIS_ROOT/cytoBand.txt",
   "hg38_masking": "$HG38_MAVIS_ROOT/hg38_masking.tab",
