@@ -23,11 +23,11 @@ workflow mavis {
   
   Map[String,String] resources = { 
   "hg38_annotations": "$HG38V110_MAVIS_ROOT/ensembl_v110_hg38_annotations.json", 
-  "hg38_dvgAnnotations": "$HG38_MAVIS_ROOT/dgv_hg38_variants.tab",
-  "hg38_cytoband": "$HG38_MAVIS_ROOT/cytoBand.txt",
-  "hg38_masking": "$HG38_MAVIS_ROOT/hg38_masking.tab",
+  "hg38_dvgAnnotations": "$HG38V110_MAVIS_ROOT/dgv_hg38_variants.tab",
+  "hg38_cytoband": "$HG38V110_MAVIS_ROOT/cytoBand.txt",
+  "hg38_masking": "$HG38V110_MAVIS_ROOT/hg38_masking.tab",
   "hg38_referenceGenome": "$HG38_ROOT/hg38_random.fa",
-  "hg38_alignerReference": "$HG38_MAVIS_ROOT/hg38.2bit",
+  "hg38_alignerReference": "$HG38V110_MAVIS_ROOT/hg38.2bit",
   "hg19_annotations": "$HG19_MAVIS_ROOT/ensembl69_hg19_annotations_with_ncrna.json", 
   "hg19_dvgAnnotations": "$HG19_MAVIS_ROOT/dgv_hg19_variants.tab",
   "hg19_cytoband": "$HG19_MAVIS_ROOT/cytoBand.txt",
