@@ -1,12 +1,12 @@
 [
     {
         "arguments": {
-            "mavis.sampleId": "EPT0068",
+            "mavis.sampleId": "Test01",
             "mavis.inputBAMs": [
                 {
                     "bam": {
                         "contents": {
-                            "configuration": "/.mounts/labs/gsi/testdata/mavis/EPT0068_CHR11_DOWNSAMPLED/input_data/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.Aligned.sortedByCoord.out_chr11.bam",
+                            "configuration": "/.mounts/labs/gsi/testdata/mavis/test_inputs/Test01.Aligned.sortedByCoord.out_chr11.bam",
                             "externalIds": [
                                 {
                                     "id": "TEST",
@@ -18,7 +18,7 @@
                     },
                     "bamIndex": {
                         "contents": {
-                            "configuration": "/.mounts/labs/gsi/testdata/mavis/EPT0068_CHR11_DOWNSAMPLED/input_data/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.Aligned.sortedByCoord.out_chr11.bam.bai",
+                            "configuration": "/.mounts/labs/gsi/testdata/mavis/test_inputs/Test01.Aligned.sortedByCoord.out_chr11.bam.bai",
                             "externalIds": [
                                 {
                                     "id": "TEST",
@@ -36,7 +36,7 @@
                     "libraryDesign": "WT",
                     "svFile": {
                         "contents": {
-                            "configuration": "/.mounts/labs/gsi/testdata/mavis/EPT0068_CHR11_DOWNSAMPLED/input_data/EPT0068_180821_NB551051_0067_AHTC7YBGX5_CTGAAGCT-AGGCTATA_L001.star-fusion.fusion_predictions.abridged_chr11.tsv",
+                            "configuration": "/.mounts/labs/gsi/testdata/mavis/test_inputs/Test01.star-fusion.fusion_predictions.abridged_chr11.tsv",
                             "externalIds": [
                                 {
                                     "id": "TEST",
@@ -96,12 +96,12 @@
            "write_to_cache": false,
            "read_from_cache": false
         },
-        "id": "EPT0068_CHR11_DOWNSAMPLED",
+        "id": "test_inputs",
         "metadata": {
             "mavis.summary": {
                 "contents": [
                     {
-                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_mavis_EPT0068_CHR11_DOWNSAMPLED_@JENKINSID@"
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_mavis_test_inputs_@JENKINSID@"
                     }
                 ],
                 "type": "ALL"
@@ -109,7 +109,7 @@
             "mavis.drawings": {
                 "contents": [
                     {
-                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_mavis_EPT0068_CHR11_DOWNSAMPLED_@JENKINSID@"
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_mavis_test_inputs_@JENKINSID@"
                     }
                 ],
                 "type": "ALL"
@@ -117,7 +117,7 @@
             "mavis.nscvWT": {
                 "contents": [
                     {
-                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_mavis_EPT0068_CHR11_DOWNSAMPLED_@JENKINSID@"
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_mavis_test_inputs_@JENKINSID@"
                     }
                 ],
                 "type": "ALL"
@@ -125,7 +125,7 @@
             "mavis.nscvWG": {
                 "contents": [
                     {
-                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_mavis_EPT0068_CHR11_DOWNSAMPLED_@JENKINSID@"
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_mavis_test_inputs_@JENKINSID@"
                     }
                 ],
                 "type": "ALL"
@@ -135,7 +135,7 @@
             {
                 "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
                 "metrics_compare": "@CHECKOUT@/tests/compare.sh",
-                "output_metrics": "/.mounts/labs/gsi/testdata/mavis/EPT0068_CHR11_DOWNSAMPLED/output_expectation/metrics/EPT0068_CHR11_DOWNSAMPLED.metrics.txt",
+                "output_metrics": "/.mounts/labs/gsi/testdata/mavis/output_metrics/workflow_test_01.metrics",
                 "type": "script"
             }
         ]
