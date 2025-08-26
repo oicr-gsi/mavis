@@ -5,21 +5,35 @@ workflow mavis {
     String sampleId
     Array[BamData] inputBAMs
     Array[SvData] svData
-	String reference
+    String reference
+    String local_code_modulefile_path = "/home/ubuntu/local_modules/gsi/modulator/modulefiles/Ubuntu24.04"
+    String local_data_modulefile_path = "/home/ubuntu/local_modules/gsi/modulator/modulefiles/data"
   }
 
   parameter_meta {
     sampleId: "sample identifier, which will be used for final naming of output files"
     inputBAMs: "Collection of alignment files with indexes and metadata"
     svData: "Collection of SV calls with metadata"
-	reference: "The genome reference build. for example: hg19, hg38"
+    reference: "The genome reference build. for example: hg19, hg38"
+    local_code_modulefile_path: "Path to locally build code modulefiles"
+    local_data_modulefile_path: "Path to locally build data modulefiles"
   }
   
   
   String filter_modules = "bcftools/1.9"
   
-  Map[String,String] mavis_modules_by_genome = { "hg19": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13", "hg38" : "mavis/2.2.6 mavis-config/1.2 hg38v110-mavis/2.2.6 hg38/p12" }
-  String mavis_modules = mavis_modules_by_genome [ reference ]
+  Map[String,String] modules_by_genome = { 
+    "hg19": "mavis/2.2.6 mavis-config/1.2", 
+    "hg38": "mavis/2.2.6 mavis-config/1.2" 
+    }
+    Map[String,String] data_modules_by_genome = { 
+    "hg19": "hg19-mavis/2.2.6 hg19/p13", 
+    "hg38": "hg38v110-mavis/2.2.6 hg38/p12" 
+    }
+
+  String mavis_modules = modules_by_genome [ reference ]
+  String mavis_data_modules = data_modules_by_genome [ reference ]
+  
   
   Map[String,String] resources = { 
   "hg38_annotations": "$HG38V110_MAVIS_ROOT/ensembl_v110_hg38_annotations.json", 
@@ -70,6 +84,9 @@ workflow mavis {
       svWorkflows = workflowNames,
       svLibDesigns = svLibraryDesigns,
       modules = mavis_modules,
+      data_modules = mavis_data_modules,
+      local_code_modulefile_path = local_code_modulefile_path, 
+      local_data_modulefile_path = local_data_modulefile_path,
       annotations       = resources [ "~{reference + '_annotations'}" ],
       dvgAnnotations    = resources [ "~{reference + '_dvgAnnotations'}" ],
       templateMetadata  = resources [ "~{reference + '_cytoband'}" ],
@@ -196,11 +213,15 @@ task runMavis {
     String drawNonSynonymousCdnaOnly = "False"
     String mavisUninformativeFilter = "True"
     String modules
+    String data_modules
+    String local_code_modulefile_path
+    String local_data_modulefile_path
     Int jobMemory = 12
     Int sleepInterval = 20
     Int timeout = 24
     Int maxBins = 100000
     Int mavisMaxTime = timeout * 1800
+    
   }
 
   parameter_meta {
@@ -233,6 +254,9 @@ task runMavis {
     drawNonSynonymousCdnaOnly: "flag for MAVIS visualization control"
     mavisUninformativeFilter: "Should be enabled if used is only interested in events inside genes, speeds up calculations"
     modules: "modules needed to run MAVIS"
+    data_modules: "Names and versions of data modules to load"
+    local_code_modulefile_path: "Path to locally build code modulefiles"
+    local_data_modulefile_path: "Path to locally build data modulefiles"
     jobMemory: "Memory allocated for this job"
     sleepInterval: "A pause after scheduling step, in seconds"
     timeout: "Timeout in hours, needed to override imposed limits"
@@ -241,7 +265,16 @@ task runMavis {
   }
 
   command <<<
- 
+    set -euo pipefail
+    . /usr/share/modules/init/bash
+    module purge  # remove any previously loaded modules
+    unset PYTHONPATH  # clear old Python paths
+
+    module use ~{local_code_modulefile_path }
+    module load ~{modules}
+    module use ~{local_data_modulefile_path }
+    module load ~{data_modules}
+
     export MAVIS_REFERENCE_GENOME=~{referenceGenome}
     export MAVIS_ANNOTATIONS=~{annotations}
     export MAVIS_MASKING=~{masking}
@@ -249,8 +282,13 @@ task runMavis {
     export MAVIS_ALIGNER_REFERENCE=~{alignerReference}
     export MAVIS_TEMPLATE_METADATA=~{templateMetadata}
     export MAVIS_TIME_LIMIT=~{mavisMaxTime}
-    # we're using system python3
-    python3 <<CODE
+    
+    # Use the compiled version python3.8.16
+    export PATH="/usr/local/bin/:$PATH"
+    /usr/local/bin/python3.8 <<CODE
+    import sys
+    sys.path.insert(0, "{output_dir}/lib/python3.8/site-packages")
+    import mavis
 
     libtypes = {'WT': "transcriptome", 'MR': "transcriptome", 'WG': "genome"}
     wfMappings = {'StructuralVariation': 'delly', 'delly': 'delly', 'arriba' : 'arriba', 'starFusion': 'starfusion', 'StarFusion': 'starfusion', 'starfusion': 'starfusion', 'manta': 'manta'}
@@ -313,7 +351,7 @@ task runMavis {
     fi
 
     export MAVIS_ALIGNER='~{mavisAligner}'
-    export MAVIS_SCHEDULER=~{mavisScheduler}
+    export MAVIS_SCHEDULER=LOCAL
     export MAVIS_DRAW_FUSIONS_ONLY=~{mavisDrawFusionOnly}
     export MAVIS_ANNOTATION_MEMORY=~{mavisAnnotationMemory}
     export MAVIS_VALIDATION_MEMORY=~{mavisValidationMemory}
@@ -322,50 +360,50 @@ task runMavis {
     export DRAW_NON_SYNONYMOUS_CDNA_ONLY=~{drawNonSynonymousCdnaOnly}
     export min_clusters_per_file=~{minClusterPerFile}
     export MAVIS_UNINFORMATIVE_FILTER=~{mavisUninformativeFilter}
-    export MAVIS_QUEUE=~{mavisQueue}
+    
+    # Setup MAVIS configuration
     mavis setup ~{outputCONFIG} -o .
-    BATCHID=$(grep MS_batch build.cfg | grep -v \] | sed s/.*-// | tail -n 1)
-    mavis schedule -o . --submit 2> >(tee launch_stderr.log)
-    sleep ~{sleepInterval}
-    LASTJOB=$(cat launch_stderr.log | grep SUBMITTED | tail -n 1 | sed s/.*\(//)
-    num='([0-9^]+)'
-    if [[ $LASTJOB =~ $num ]]; then
-      jobID=$BASH_REMATCH
-      while qstat | grep $jobID; do
-          sleep 5
-      done
-      if [ -f summary/MAVIS-$jobID.COMPLETE ]; then
-          ### create an empty zip file, which will be updated with drawings and legends.  if there are none, than the empty file is provisioned out
-          echo | zip -q > ~{prefix}.mavis_drawings.zip && zip -dq ~{prefix}.mavis_drawings.zip -
+    
+    # Run MAVIS locally with submit flag (required even for local execution)
+    echo "Running MAVIS locally..."
+    mavis schedule -o . --submit 2>&1 | tee mavis_run.log
+    
+    # Local execution should complete immediately, so we check results
+    sleep 10
+    
+    # Check for successful completion
+    if [ -d "summary" ] && [ -f summary/mavis_summary_all_*.tab ]; then
+        echo "MAVIS completed successfully"
+        
+        ### create an empty zip file, which will be updated with drawings and legends.  if there are none, than the empty file is provisioned out
+        echo | zip -q > ~{prefix}.mavis_drawings.zip && zip -dq ~{prefix}.mavis_drawings.zip -
 
-          ### find all drawing directories, recursively add the drawings
-          for draw_dir in `ls -d *~{sid}\_diseased_*/annotate/*/drawings`
-          do
-            zip -qjur ~{prefix}.mavis_drawings.zip $draw_dir
-          done
+        ### find all drawing directories, recursively add the drawings
+        for draw_dir in `ls -d *~{sid}\_diseased_*/annotate/*/drawings 2>/dev/null`
+        do
+          zip -qjur ~{prefix}.mavis_drawings.zip $draw_dir
+        done
 
-          ### there should be a single mavis_summary_all files
-          cp summary/mavis_summary_all_*.tab ~{prefix}.mavis_summary.tab
+        ### there should be a single mavis_summary_all files
+        cp summary/mavis_summary_all_*.tab ~{prefix}.mavis_summary.tab
 
-          ### non-synonymous coding variants are separate into WG or WT files; each may or may not be produced
-          if [ -e summary/mavis_summary_WG.*_non-synonymous_coding_variants.tab ];then
-            cp summary/mavis_summary_WG.*_non-synonymous_coding_variants.tab ~{prefix}.WG_non-synonymous_coding_variants.tab
-          fi
-          if [ -e summary/mavis_summary_WT.*_non-synonymous_coding_variants.tab ];then
-            cp summary/mavis_summary_WT.*_non-synonymous_coding_variants.tab ~{prefix}.WT_non-synonymous_coding_variants.tab
-          fi		  
-          exit 0
-      fi
-      echo "MAVIS job finished but THERE ARE NO RESULTS"
-      exit 1
+        ### non-synonymous coding variants are separate into WG or WT files; each may or may not be produced
+        if [ -e summary/mavis_summary_WG.*_non-synonymous_coding_variants.tab ];then
+          cp summary/mavis_summary_WG.*_non-synonymous_coding_variants.tab ~{prefix}.WG_non-synonymous_coding_variants.tab
+        fi
+        if [ -e summary/mavis_summary_WT.*_non-synonymous_coding_variants.tab ];then
+          cp summary/mavis_summary_WT.*_non-synonymous_coding_variants.tab ~{prefix}.WT_non-synonymous_coding_variants.tab
+        fi		  
+        exit 0
+    else
+        echo "MAVIS job finished but THERE ARE NO RESULTS"
+        cat mavis_run.log
+        exit 1
     fi
-    echo "Could not retrieve last job id"
-    exit 1
   >>>
-
+  
   runtime {
     memory:  "~{jobMemory} GB"
-    modules: "~{modules}"
     timeout: "~{timeout}"
   }
 
