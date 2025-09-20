@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from optparse import OptionParser
+from argparse import ArgumentParser
 
 """MAVIS configurator
                 
@@ -23,23 +23,23 @@ assign_arrays = {'WT': [], 'MR': [], 'WG': []}
 wfMappings = {'StructuralVariation': 'delly', 'Delly': 'delly', 'StarFusion': 'starfusion', 'Manta': 'manta'}
 svMappings = {'delly': ["WG"], 'starfusion': ["WT","MR"], 'manta': ['WG']}
 
-parser = OptionParser()
-parser.add_option("-b", "--bam", dest="bam",
+parser = ArgumentParser()
+parser.add_argument("-b", "--bam", dest="bam",
                   help="input bams")
-parser.add_option("-l", "--lib", dest="lib",
+parser.add_argument("-l", "--lib", dest="lib",
                   help="input library names")
-parser.add_option("-s", "--svdata", dest="svdata",
+parser.add_argument("-s", "--svdata", dest="svdata",
                   help="input variants")
-parser.add_option("-w", "--workflow", dest="wf",
+parser.add_argument("-w", "--workflow", dest="wf",
                   help="workflow names")
-parser.add_option("-d", "--donor", dest="donor",
+parser.add_argument("-d", "--donor", dest="donor",
                   help="donor id")
-parser.add_option("-c", "--config", dest="conf",
+parser.add_argument("-c", "--config", dest="conf",
                   help="config file")
 
 # Small subroutine to check the validity of inputs
 
-def validate_options(parser: OptionParser) -> OptionParser:
+def validate_options(parser: ArgumentParser) -> ArgumentParser:
     (opts, arguments) = parser.parse_args()
     """Make sure we have bams, sv calls and matching number of metadata pieces"""
     if opts.bam is None:

@@ -65,7 +65,8 @@ workflow mavis {
       call filterDellyInput {
         input:
           svFile = s.svFile,
-          modules = filter_modules
+          modules = filter_modules,
+          local_code_modulefile_path = local_code_modulefile_path
       }
     }
     File svFiles = select_first([filterDellyInput.fsvFile,s.svFile])
@@ -151,6 +152,7 @@ task filterDellyInput {
     Int jobMemory = 12
     Int timeout = 5
     String svFileBase = basename(svFile,".vcf.gz")
+    String local_code_modulefile_path
   }
   parameter_meta {
     svFile: "the file that needs to be filtered"
@@ -158,15 +160,17 @@ task filterDellyInput {
     modules: "modules needed to run filtering"
     jobMemory: "Memory allocated for this job"
     timeout: "Timeout in hours, needed to override imposed limits"
+    local_code_modulefile_path: "Path to locally build code modulefiles"
   }
 
   command <<<
+    module use ~{local_code_modulefile_path }
+    module load ~{modules}
     bcftools view -i "%FILTER='PASS'" ~{svFile} -Oz -o ~{svFileBase}.pass.vcf.gz
   >>>
 
   runtime {
     memory:  "~{jobMemory} GB"
-    modules: "~{modules}"
     timeout: "~{timeout}"
   }
 
