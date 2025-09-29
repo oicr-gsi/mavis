@@ -164,6 +164,8 @@ task filterDellyInput {
   }
 
   command <<<
+   set -eu -o pipefail
+    . /usr/share/modules/init/bash
     module use ~{local_code_modulefile_path }
     module load ~{modules}
     bcftools view -i "%FILTER='PASS'" ~{svFile} -Oz -o ~{svFileBase}.pass.vcf.gz
