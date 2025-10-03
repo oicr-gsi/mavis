@@ -243,9 +243,7 @@ task runMavis {
     export MAVIS_TEMPLATE_METADATA=~{templateMetadata}
     export MAVIS_TIME_LIMIT=~{mavisMaxTime}
     
-    # Use the compiled version python3.8.16
-    export PATH="/usr/local/bin/:$PATH"
-    /usr/local/bin/python3.8 <<CODE
+    python3<<CODE
     import sys
     sys.path.insert(0, "{output_dir}/lib/python3.8/site-packages")
     import mavis
