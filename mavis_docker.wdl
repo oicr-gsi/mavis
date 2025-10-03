@@ -69,7 +69,7 @@ workflow mavis {
       masking           = resources [ "~{reference + '_masking'}" ],
       referenceGenome   = resources [ "~{reference + '_referenceGenome'}" ],
       alignerReference  = resources [ "~{reference + '_alignerReference'}" ],
-      arribaConverter   = "$MAVIS_CONFIG_ROOT/bin/parse_arriba.py"
+      arribaConverter   = "/usr/local/bin/parse_arriba.py"
   }
 
   meta {
