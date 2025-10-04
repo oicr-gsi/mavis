@@ -190,7 +190,7 @@ task runMavis {
     String mavisUninformativeFilter = "True"
     String docker = "kevin2peng/mavis:2.2.6"
     Int jobMemory = 12
-    Int sleepInterval = 20
+    Int sleepInterval = 30
     Int timeout = 24
     Int maxBins = 100000
     Int mavisMaxTime = timeout * 1800
@@ -326,9 +326,34 @@ task runMavis {
     echo "Running MAVIS locally..."
     mavis schedule -o . --submit 2>&1 | tee mavis_run.log
     
-    # Local execution should complete immediately, so we check results
-    sleep 10
+    # Waiting for MAVIS jobs to complete
+  echo "Waiting for MAVIS jobs to complete..."
+  timeout=7200  # 2 hours max
+  elapsed=0
+  while [ $elapsed -lt $timeout ]; do
+    # Check if summary files exist
+    if [ -d "summary" ] && [ -f summary/mavis_summary_all_*.tab ]; then
+      echo "MAVIS completed after $elapsed seconds"
+      break
+    fi
     
+    # Check build.cfg for job status
+    if grep -q "COMPLETE" build.cfg 2>/dev/null; then
+      echo "Jobs marked as COMPLETE"
+      break
+    fi
+    
+    sleep ~{sleepInterval}
+    elapsed=$((elapsed + 30))
+    echo "Still waiting... ($elapsed seconds elapsed)"
+  done
+    
+    if [ $elapsed -ge $timeout ]; then
+        echo "MAVIS timed out after $timeout seconds"
+        cat mavis_run.log
+        exit 1
+    fi
+
     # Check for successful completion
     if [ -d "summary" ] && [ -f summary/mavis_summary_all_*.tab ]; then
         echo "MAVIS completed successfully"
