@@ -327,27 +327,31 @@ task runMavis {
     mavis schedule -o . --submit 2>&1 | tee mavis_run.log
     
     # Waiting for MAVIS jobs to complete
-  echo "Waiting for MAVIS jobs to complete..."
-  timeout=7200  # 2 hours max
-  elapsed=0
-  while [ $elapsed -lt $timeout ]; do
-    # Check if summary files exist
-    if [ -d "summary" ] && [ -f summary/mavis_summary_all_*.tab ]; then
-      echo "MAVIS completed after $elapsed seconds"
-      break
+    echo "Waiting for MAVIS jobs to complete..."
+    timeout=7200
+    elapsed=0
+    while [ $elapsed -lt $timeout ]; do
+    # Check if summary files exist (safer check)
+    if [ -d "summary" ]; then
+        if ls summary/mavis_summary_all_*.tab >/dev/null 2>&1; then
+        echo "MAVIS completed after $elapsed seconds"
+        break
+        fi
     fi
     
     # Check build.cfg for job status
-    if grep -q "COMPLETE" build.cfg 2>/dev/null; then
-      echo "Jobs marked as COMPLETE"
-      break
+    if [ -f "build.cfg" ]; then
+        if grep -q "COMPLETE" build.cfg 2>/dev/null; then
+        echo "Jobs marked as COMPLETE"
+        break
+        fi
     fi
     
-    sleep ~{sleepInterval}
+    sleep 30
     elapsed=$((elapsed + 30))
     echo "Still waiting... ($elapsed seconds elapsed)"
-  done
-    
+    done
+
     if [ $elapsed -ge $timeout ]; then
         echo "MAVIS timed out after $timeout seconds"
         cat mavis_run.log
