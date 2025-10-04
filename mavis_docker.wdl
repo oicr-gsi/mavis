@@ -171,12 +171,12 @@ task runMavis {
     String arribaConverter
     String sid
     String prefix
-    String referenceGenome
-    String annotations
-    String masking
-    String dvgAnnotations
-    String alignerReference
-    String templateMetadata
+    File annotations
+    File dvgAnnotations
+    File templateMetadata
+    File masking
+    File referenceGenome
+    File alignerReference
     String mavisAligner = "blat"
     String mavisScheduler = "SGE"
     String mavisDrawFusionOnly = "False"
