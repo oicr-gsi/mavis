@@ -189,7 +189,7 @@ task runMavis {
     String drawNonSynonymousCdnaOnly = "False"
     String mavisUninformativeFilter = "True"
     String docker = "kevin2peng/mavis:2.2.6"
-    Int jobMemory = 12
+    Int jobMemory = 32
     Int sleepInterval = 30
     Int timeout = 24
     Int maxBins = 100000
@@ -234,7 +234,15 @@ task runMavis {
   }
 
   command <<<
-    set -euo pipefail
+    set -euox pipefail
+
+    # Write to stderr immediately to confirm script starts
+    echo "=== Script started at $(date) ===" >&2
+    echo "Memory available:" >&2
+    free -h >&2
+    echo "Disk space:" >&2
+    df -h >&2
+
     export MAVIS_REFERENCE_GENOME=~{referenceGenome}
     export MAVIS_ANNOTATIONS=~{annotations}
     export MAVIS_MASKING=~{masking}
@@ -242,8 +250,12 @@ task runMavis {
     export MAVIS_ALIGNER_REFERENCE=~{alignerReference}
     export MAVIS_TEMPLATE_METADATA=~{templateMetadata}
     export MAVIS_TIME_LIMIT=~{mavisMaxTime}
-    
-    python3<<CODE
+
+    echo "=== Environment variables set ===" >&2
+
+    # Python config generation
+    echo "=== Starting Python config generation ===" >&2
+    python3.8<<CODE
     import sys
     sys.path.insert(0, "{output_dir}/lib/python3.8/site-packages")
     import mavis
@@ -265,24 +277,23 @@ task runMavis {
     config_lines = []
     assign_arrays = {}
     for lt in libtypes.keys():
-       assign_arrays[lt] = []
+      assign_arrays[lt] = []
 
     for b in range(len(bams)):
-       flag = ('False' if libs[b] == 'WG' else 'True')
-       config_lines.append( "--library " + libs[b] + ".~{sid} " + libtypes[libs[b]] + " diseased " + flag + " " + bams[b] + " \\\\" )
-
+      flag = ('False' if libs[b] == 'WG' else 'True')
+      config_lines.append( "--library " + libs[b] + ".~{sid} " + libtypes[libs[b]] + " diseased " + flag + " " + bams[b] + " \\\\" )
 
     for s in range(len(svdata)):
-       for w in wfMappings.keys():
+      for w in wfMappings.keys():
           if w in wfs[s]:
-             if w == 'arriba':
+            if w == 'arriba':
                 config_lines.append( "--external_conversion arriba \"~{arribaConverter}  " + svdata[s] + "\"" + " \\\\" )
-             else:
+            else:
                 config_lines.append( "--convert " + wfMappings[w] + " " + svdata[s] + " " + wfMappings[w] + " \\\\" )
-             assign_arrays[svlibs[s]].append(wfMappings[w])
+            assign_arrays[svlibs[s]].append(wfMappings[w])
 
     for b in range(len(bams)):
-       if len(assign_arrays[libs[b]]) > 0:
+      if len(assign_arrays[libs[b]]) > 0:
           separator = " "
           tools = separator.join(assign_arrays[libs[b]])
           config_lines.append( "--assign " + libs[b] + ".~{sid} " + tools + " \\\\" )
@@ -292,23 +303,30 @@ task runMavis {
     f.write('mavis config \\\\\n')
     f.write('\n'.join(config_lines) + '\n')
     if "WT" in libs or "MR" in libs:
-       f.write("--transcriptome_bins 500" + ' \\\\\n')
+      f.write("--transcriptome_bins 500" + ' \\\\\n')
     if "WG" in libs:
-       f.write("--genome_bins 500" + ' \\\\\n')
+      f.write("--genome_bins 500" + ' \\\\\n')
     f.write("--write ~{outputCONFIG}\n")
     f.close()
     CODE
-    
+
+    echo "=== Python config generation complete ===" >&2
+
     chmod +x ~{scriptName}
-    ./~{scriptName} &
-    wait
-    
+    ./~{scriptName}
+
+    echo "=== Config script executed ===" >&2
+
     if [ ! -f ~{outputCONFIG} ]; then
+      echo "Config not found, retrying with different bins" >&2
       sed -i 's/_bins 500/_bins ~{maxBins}/' ~{scriptName}
       ./~{scriptName}
     fi
 
-    export MAVIS_ALIGNER='~{mavisAligner}'
+    echo "=== Config file created ===" >&2
+    ls -lh ~{outputCONFIG} >&2
+
+    export MAVIS_ALIGNER="~{mavisAligner}"
     export MAVIS_SCHEDULER=LOCAL
     export MAVIS_DRAW_FUSIONS_ONLY=~{mavisDrawFusionOnly}
     export MAVIS_ANNOTATION_MEMORY=~{mavisAnnotationMemory}
@@ -318,46 +336,87 @@ task runMavis {
     export DRAW_NON_SYNONYMOUS_CDNA_ONLY=~{drawNonSynonymousCdnaOnly}
     export min_clusters_per_file=~{minClusterPerFile}
     export MAVIS_UNINFORMATIVE_FILTER=~{mavisUninformativeFilter}
-    
-    # Setup MAVIS configuration
+
+    echo "=== MAVIS environment variables set ===" >&2
+    echo "MAVIS_ALIGNER=${MAVIS_ALIGNER}" >&2
+
+
+    echo "=== Starting MAVIS setup ===" >&2
     mavis setup ~{outputCONFIG} -o .
-    
-    # Run MAVIS locally with submit flag (required even for local execution)
-    echo "Running MAVIS locally..."
-    mavis schedule -o . --submit 2>&1 | tee mavis_run.log
-    
-    # Waiting for MAVIS jobs to complete
-    echo "Waiting for MAVIS jobs to complete..."
-    timeout=7200
-    elapsed=0
-    while [ $elapsed -lt $timeout ]; do
-    # Check if summary files exist (safer check)
-    if [ -d "summary" ]; then
-        if ls summary/mavis_summary_all_*.tab >/dev/null 2>&1; then
-        echo "MAVIS completed after $elapsed seconds"
-        break
-        fi
-    fi
-    
-    # Check build.cfg for job status
-    if [ -f "build.cfg" ]; then
-        if grep -q "COMPLETE" build.cfg 2>/dev/null; then
-        echo "Jobs marked as COMPLETE"
-        break
-        fi
-    fi
-    
-    sleep 30
-    elapsed=$((elapsed + 30))
-    echo "Still waiting... ($elapsed seconds elapsed)"
+    echo "=== MAVIS setup complete ===" >&2
+
+    # Extract library name and parameters
+    echo "=== Extracting library parameters ===" >&2
+    set +x
+    eval $(python3 << EOF
+    import configparser
+    config = configparser.ConfigParser()
+    config.read('~{outputCONFIG}')
+    skip = ['reference', 'convert', 'general', 'schedule', 'cluster', 'validate', 'annotate', 'pairing', 'summary']
+    for section in config.sections():
+        if section not in skip:
+            print(f"LIBRARY_NAME='{section}'")
+            print(f"BAM_FILE='{config[section]['bam_file']}'")
+            print(f"READ_LENGTH='{config[section]['read_length']}'")
+            print(f"MEDIAN_FRAGMENT='{config[section]['median_fragment_size']}'")
+            print(f"STDEV_FRAGMENT='{config[section]['stdev_fragment_size']}'")
+            break
+    EOF
+    )
+    REFERENCE="${MAVIS_REFERENCE_GENOME}"
+    ALIGNER_REF="${MAVIS_ALIGNER_REFERENCE}"
+    LIBRARY_DIR=$(ls -d ${LIBRARY_NAME}_diseased_* 2>/dev/null | head -1)
+    set -x
+
+    echo "=== Parameters extracted ===" >&2
+    echo "LIBRARY_NAME=${LIBRARY_NAME}" >&2
+    echo "LIBRARY_DIR=${LIBRARY_DIR}" >&2
+    echo "BAM_FILE=${BAM_FILE}" >&2
+
+    # Validate
+    echo "=== Starting validate stage ===" >&2
+    echo "=== Listing cluster directory ===" >&2
+    ls -lh ${LIBRARY_DIR}/cluster/ >&2
+
+    for batch_dir in ${LIBRARY_DIR}/validate/batch-*/; do
+      batch_name=$(basename "$batch_dir")
+      
+      echo "=== Processing batch: ${batch_name} ===" >&2
+      
+      cluster_output="${LIBRARY_DIR}/cluster/${batch_name}.tab"
+      
+      if [ ! -f "$cluster_output" ]; then
+        echo "ERROR: Cluster output not found: ${cluster_output}" >&2
+        exit 1
+      fi
+      
+      echo "=== Using cluster output: ${cluster_output} ===" >&2
+      
+      mavis validate --output "$batch_dir" --library "$LIBRARY_NAME" \
+        --protocol genome --bam_file "$BAM_FILE" --read_length "$READ_LENGTH" \
+        --median_fragment_size "$MEDIAN_FRAGMENT" --stdev_fragment_size "$STDEV_FRAGMENT" \
+        --reference_genome "$REFERENCE" --aligner_reference "$ALIGNER_REF" \
+        --inputs "$cluster_output" 2>&1 | tee -a validate_${batch_name}.log >&2 
+        
+      
+      echo "=== Batch ${batch_name} complete at $(date) ===" >&2
     done
 
-    if [ $elapsed -ge $timeout ]; then
-        echo "MAVIS timed out after $timeout seconds"
-        cat mavis_run.log
-        exit 1
-    fi
+    echo "=== All validate batches complete ===" >&2
+    # Annotate
+    for batch_dir in ${LIBRARY_DIR}/annotate/batch-*/; do
+      validate_dir="${batch_dir/annotate/validate}"
+      mavis annotate --output "$batch_dir" --library "$LIBRARY_NAME" \
+        --inputs "${validate_dir}/validation-passed.tab"
+    done
 
+    # Pairing
+    mavis pairing --output "./pairing" --library "$LIBRARY_NAME" \
+      --inputs ${LIBRARY_DIR}/annotate/batch-*/annotations.tab
+
+    # Summary
+    mavis summary --output "./summary" --library "$LIBRARY_NAME" \
+      --inputs "./pairing/mavis_paired*.tab"
     # Check for successful completion
     if [ -d "summary" ] && [ -f summary/mavis_summary_all_*.tab ]; then
         echo "MAVIS completed successfully"
