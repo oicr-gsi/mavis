@@ -380,8 +380,21 @@ task runMavis {
       --inputs ${LIBRARY_DIR}/annotate/batch-*/annotations.tab
 
     # Summary
-    mavis summary --output "./summary" --library "$LIBRARY_NAME" \
-      --inputs "./pairing/mavis_paired*.tab"
+    mavis summary \
+      --output "./summary" \
+      --inputs ./pairing/mavis_paired*.tab \
+      --annotations "${MAVIS_ANNOTATIONS}" \
+      --dgv_annotation "${MAVIS_DGV_ANNOTATION}" \
+      --flanking_call_distance 50 \
+      --split_call_distance 20 \
+      --contig_call_distance 10 \
+      --spanning_call_distance 20 \
+      --filter_min_remapped_reads 5 \
+      --filter_min_spanning_reads 5 \
+      --filter_min_flanking_reads 10 \
+      --filter_min_split_reads 5 \
+      --filter_min_linking_split_reads 1
+
     # Check for successful completion
     if [ -d "summary" ] && [ -f summary/mavis_summary_all_*.tab ]; then
         echo "MAVIS completed successfully"
