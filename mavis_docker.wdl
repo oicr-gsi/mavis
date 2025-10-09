@@ -236,13 +236,6 @@ task runMavis {
   command <<<
     set -euox pipefail
 
-    # Write to stderr immediately to confirm script starts
-    echo "=== Script started at $(date) ===" >&2
-    echo "Memory available:" >&2
-    free -h >&2
-    echo "Disk space:" >&2
-    df -h >&2
-
     export MAVIS_REFERENCE_GENOME=~{referenceGenome}
     export MAVIS_ANNOTATIONS=~{annotations}
     export MAVIS_MASKING=~{masking}
@@ -251,10 +244,7 @@ task runMavis {
     export MAVIS_TEMPLATE_METADATA=~{templateMetadata}
     export MAVIS_TIME_LIMIT=~{mavisMaxTime}
 
-    echo "=== Environment variables set ===" >&2
-
     # Python config generation
-    echo "=== Starting Python config generation ===" >&2
     python3.8<<CODE
     import sys
     sys.path.insert(0, "{output_dir}/lib/python3.8/site-packages")
@@ -310,12 +300,8 @@ task runMavis {
     f.close()
     CODE
 
-    echo "=== Python config generation complete ===" >&2
-
     chmod +x ~{scriptName}
     ./~{scriptName}
-
-    echo "=== Config script executed ===" >&2
 
     if [ ! -f ~{outputCONFIG} ]; then
       echo "Config not found, retrying with different bins" >&2
@@ -323,7 +309,6 @@ task runMavis {
       ./~{scriptName}
     fi
 
-    echo "=== Config file created ===" >&2
     ls -lh ~{outputCONFIG} >&2
 
     export MAVIS_ALIGNER="~{mavisAligner}"
@@ -337,16 +322,9 @@ task runMavis {
     export min_clusters_per_file=~{minClusterPerFile}
     export MAVIS_UNINFORMATIVE_FILTER=~{mavisUninformativeFilter}
 
-    echo "=== MAVIS environment variables set ===" >&2
-    echo "MAVIS_ALIGNER=${MAVIS_ALIGNER}" >&2
-
-
-    echo "=== Starting MAVIS setup ===" >&2
     mavis setup ~{outputCONFIG} -o .
-    echo "=== MAVIS setup complete ===" >&2
 
     # Extract library name and parameters
-    echo "=== Extracting library parameters ===" >&2
     set +x
     eval $(python3 << EOF
     import configparser
@@ -368,20 +346,11 @@ task runMavis {
     LIBRARY_DIR=$(ls -d ${LIBRARY_NAME}_diseased_* 2>/dev/null | head -1)
     set -x
 
-    echo "=== Parameters extracted ===" >&2
-    echo "LIBRARY_NAME=${LIBRARY_NAME}" >&2
-    echo "LIBRARY_DIR=${LIBRARY_DIR}" >&2
-    echo "BAM_FILE=${BAM_FILE}" >&2
-
     # Validate
-    echo "=== Starting validate stage ===" >&2
-    echo "=== Listing cluster directory ===" >&2
     ls -lh ${LIBRARY_DIR}/cluster/ >&2
 
     for batch_dir in ${LIBRARY_DIR}/validate/batch-*/; do
       batch_name=$(basename "$batch_dir")
-      
-      echo "=== Processing batch: ${batch_name} ===" >&2
       
       cluster_output="${LIBRARY_DIR}/cluster/${batch_name}.tab"
       
@@ -390,23 +359,19 @@ task runMavis {
         exit 1
       fi
       
-      echo "=== Using cluster output: ${cluster_output} ===" >&2
-      
       mavis validate --output "$batch_dir" --library "$LIBRARY_NAME" \
         --protocol genome --bam_file "$BAM_FILE" --read_length "$READ_LENGTH" \
         --median_fragment_size "$MEDIAN_FRAGMENT" --stdev_fragment_size "$STDEV_FRAGMENT" \
         --reference_genome "$REFERENCE" --aligner_reference "$ALIGNER_REF" \
         --inputs "$cluster_output" 2>&1 | tee -a validate_${batch_name}.log >&2 
         
-      
-      echo "=== Batch ${batch_name} complete at $(date) ===" >&2
     done
 
-    echo "=== All validate batches complete ===" >&2
     # Annotate
     for batch_dir in ${LIBRARY_DIR}/annotate/batch-*/; do
       validate_dir="${batch_dir/annotate/validate}"
       mavis annotate --output "$batch_dir" --library "$LIBRARY_NAME" \
+        --protocol genome \
         --inputs "${validate_dir}/validation-passed.tab"
     done
 
