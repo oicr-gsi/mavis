@@ -189,7 +189,7 @@ task runMavis {
     String drawNonSynonymousCdnaOnly = "False"
     String mavisUninformativeFilter = "True"
     String docker = "kevin2peng/mavis:2.2.6"
-    Int jobMemory = 32
+    Int jobMemory = 48
     Int sleepInterval = 30
     Int timeout = 24
     Int maxBins = 100000
@@ -234,7 +234,7 @@ task runMavis {
   }
 
   command <<<
-    set -euox pipefail
+    set -euo pipefail
 
     export MAVIS_REFERENCE_GENOME=~{referenceGenome}
     export MAVIS_ANNOTATIONS=~{annotations}
@@ -325,7 +325,6 @@ task runMavis {
     mavis setup ~{outputCONFIG} -o .
 
     # Extract library name and parameters
-    set +x
     eval $(python3 << EOF
     import configparser
     config = configparser.ConfigParser()
@@ -344,29 +343,25 @@ task runMavis {
     REFERENCE="${MAVIS_REFERENCE_GENOME}"
     ALIGNER_REF="${MAVIS_ALIGNER_REFERENCE}"
     LIBRARY_DIR=$(ls -d ${LIBRARY_NAME}_diseased_* 2>/dev/null | head -1)
-    set -x
 
     # Validate
-    ls -lh ${LIBRARY_DIR}/cluster/ >&2
-
     for batch_dir in ${LIBRARY_DIR}/validate/batch-*/; do
       batch_name=$(basename "$batch_dir")
-      
+
       cluster_output="${LIBRARY_DIR}/cluster/${batch_name}.tab"
       
       if [ ! -f "$cluster_output" ]; then
         echo "ERROR: Cluster output not found: ${cluster_output}" >&2
         exit 1
       fi
-      
+
       mavis validate --output "$batch_dir" --library "$LIBRARY_NAME" \
         --protocol genome --bam_file "$BAM_FILE" --read_length "$READ_LENGTH" \
         --median_fragment_size "$MEDIAN_FRAGMENT" --stdev_fragment_size "$STDEV_FRAGMENT" \
         --reference_genome "$REFERENCE" --aligner_reference "$ALIGNER_REF" \
         --inputs "$cluster_output" 2>&1 | tee -a validate_${batch_name}.log >&2 
-        
     done
-
+    
     # Annotate
     for batch_dir in ${LIBRARY_DIR}/annotate/batch-*/; do
       validate_dir="${batch_dir/annotate/validate}"
@@ -376,7 +371,7 @@ task runMavis {
     done
 
     # Pairing
-    mavis pairing --output "./pairing" --library "$LIBRARY_NAME" \
+    mavis pairing --output "./pairing" \
       --inputs ${LIBRARY_DIR}/annotate/batch-*/annotations.tab
 
     # Summary
