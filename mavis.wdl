@@ -6,8 +6,8 @@ workflow mavis {
     Array[BamData] inputBAMs
     Array[SvData] svData
     String reference
-    String local_code_modulefile_path = "/home/ubuntu/local_modules/gsi/modulator/modulefiles/Ubuntu24.04"
-    String local_data_modulefile_path = "/home/ubuntu/local_modules/gsi/modulator/modulefiles/data"
+    String local_code_modulefile_path = "/home/gpeng_oicr_on_ca/local_modules/gsi/modulator/modulefiles/Ubuntu24.04"
+    String local_data_modulefile_path = "/home/gpeng_oicr_on_ca/local_modules/gsi/modulator/modulefiles/data"
   }
 
   parameter_meta {
@@ -291,7 +291,7 @@ task runMavis {
     
     # Use the compiled version python3.8.16
     export PATH="/usr/local/bin/:$PATH"
-    /usr/local/bin/python3.8 <<CODE
+    /home/gpeng_oicr_on_ca/python38/Python-3.8.16/bin/python3.8 <<CODE
     import sys
     sys.path.insert(0, "{output_dir}/lib/python3.8/site-packages")
     import mavis
@@ -367,12 +367,19 @@ task runMavis {
     export min_clusters_per_file=~{minClusterPerFile}
     export MAVIS_UNINFORMATIVE_FILTER=~{mavisUninformativeFilter}
     
+    # Add concurrency limit to config
+    cat >> mavis_config.cfg << 'EOF'
+
+    [schedule]
+    concurrency_limit = 2
+    EOF
+
     # Setup MAVIS configuration
     mavis setup ~{outputCONFIG} -o .
-    
+
     # Run MAVIS locally with submit flag (required even for local execution)
     echo "Running MAVIS locally..."
-    mavis schedule -o . --submit 2>&1 | tee mavis_run.log
+    mavis schedule -o . --submit  2>&1 | tee mavis_run.log
     
     # Local execution should complete immediately, so we check results
     sleep 10
@@ -399,7 +406,7 @@ task runMavis {
         fi
         if [ -e summary/mavis_summary_WT.*_non-synonymous_coding_variants.tab ];then
           cp summary/mavis_summary_WT.*_non-synonymous_coding_variants.tab ~{prefix}.WT_non-synonymous_coding_variants.tab
-        fi		  
+        fi                
         exit 0
     else
         echo "MAVIS job finished but THERE ARE NO RESULTS"
