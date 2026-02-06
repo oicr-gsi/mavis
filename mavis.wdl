@@ -18,7 +18,7 @@ workflow mavis {
   
   String filter_modules = "bcftools/1.9"
   
-  Map[String,String] mavis_modules_by_genome = { "hg19": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13", "hg38" : "mavis/2.2.6 mavis-config/1.2 hg38v110-mavis/2.2.6 hg38/p12" }
+  Map[String,String] mavis_modules_by_genome = { "hg19": "mavis/2.2.6 mavis-config/1.2 hg19-mavis/2.2.6 hg19/p13", "hg38" : "mavis/2.2.6 mavis-config/1.2 hg38v110-mavis/2.2.6 hg38/p12", "hg38noAlt" : "mavis/2.2.6 mavis-config/1.2 hg38v110-mavis/2.2.6 hg38-noalt/p12" }
   String mavis_modules = mavis_modules_by_genome [ reference ]
   
   Map[String,String] resources = { 
@@ -33,7 +33,13 @@ workflow mavis {
   "hg19_cytoband": "$HG19_MAVIS_ROOT/cytoBand.txt",
   "hg19_masking": "$HG19_MAVIS_ROOT/hg19_masking.tab",
   "hg19_referenceGenome": "$HG19_ROOT/hg19_random.fa",
-  "hg19_alignerReference": "$HG19_MAVIS_ROOT/hg19.2bit"
+  "hg19_alignerReference": "$HG19_MAVIS_ROOT/hg19.2bit",
+  "hg38noAlt_annotations": "$HG38V110_MAVIS_ROOT/ensembl_v110_hg38_annotations.json", 
+  "hg38noAlt_dvgAnnotations": "$HG38V110_MAVIS_ROOT/dgv_hg38_variants.tab",
+  "hg38noAlt_cytoband": "$HG38V110_MAVIS_ROOT/cytoBand.txt",
+  "hg38noAlt_masking": "$HG38V110_MAVIS_ROOT/hg38_masking.tab",
+  "hg38noAlt_referenceGenome": "$HG38_NOALT_ROOT/hg38_noAlt.fa",
+  "hg38noAlt_alignerReference": "$HG38V110_MAVIS_ROOT/hg38.2bit",
  }
 
   String build_annotations = resources [ "~{reference + '_annotations'}" ]
