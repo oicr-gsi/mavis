@@ -105,8 +105,8 @@ workflow mavis {
   ###      input:
   ###        batch_file = batch_input,
   ###        mavis_script = setupMavis.WT_val,
-  ###        bam = wg_bam,
-  ###        bamIndex = wg_bai,
+  ###        bam = wt_bam,
+  ###        bamIndex = wt_bai,
   ###        modules = mavis_modules,
   ###    }
   ###    call annotate as annotate_WT {
