@@ -192,7 +192,6 @@ task runMavis {
     Int mavisTransValidationMemory = 32000
     Int mavisMemoryLimit = 32000
     String mavisQueue = "u20.q"
-    #Int minClusterPerFile = 10
     Int minClusterPerFileWG = 10
     Int minClusterPerFileWT = 10
     String drawNonSynonymousCdnaOnly = "False"
