@@ -192,7 +192,8 @@ task runMavis {
     Int mavisTransValidationMemory = 32000
     Int mavisMemoryLimit = 32000
     String mavisQueue = "u20.q"
-    Int minClusterPerFile = 10
+    Int minClusterPerFileWG = 10
+    Int minClusterPerFileWT = 10
     String drawNonSynonymousCdnaOnly = "False"
     String mavisUninformativeFilter = "True"
     String modules
@@ -229,7 +230,8 @@ task runMavis {
     mavisTransValidationMemory: "Memory allocated for transvalidation step"
     mavisMemoryLimit: "Max Memory allocated for MAVIS"
     mavisQueue: "the mavis job queue"
-    minClusterPerFile: "Determines the way parallel calculations are organized "
+    minClusterPerFileWG: "Parellization control by limiting cluster size "
+    minClusterPerFileWT: "Parellization control by limiting cluster size "
     drawNonSynonymousCdnaOnly: "flag for MAVIS visualization control"
     mavisUninformativeFilter: "Should be enabled if used is only interested in events inside genes, speeds up calculations"
     modules: "modules needed to run MAVIS"
@@ -307,10 +309,39 @@ task runMavis {
     ./~{scriptName} &
     wait
     
+
+    
+    ##################
+    ## post setup adjustment to handle a failure, not sure why this was needed
+    ## it adjusts the bins value then tries to run it again
     if [ ! -f ~{outputCONFIG} ]; then
       sed -i 's/_bins 500/_bins ~{maxBins}/' ~{scriptName}
       ./~{scriptName}
     fi
+    ##################
+    
+    
+    ##################
+    ## post setup adjustment to inject the cluster size into the cfg file
+    ## it is not clear how to do this with mavis setup
+    cp mavis_config.cfg mavis_config.cfg.original
+    WTblock=`grep -n "\[WT" mavis_config.cfg | cut -d: -f1`
+    if [ $WTblock>0 ]
+    then
+      n=$((WTblock+4))
+      sed -i "${n}i min_clusters_per_file = ~{minClusterPerFileWT} " mavis_config.cfg
+    fi
+
+    WGblock=`grep -n "\[WG" mavis_config.cfg | cut -d: -f1`
+    if [ $WGblock>0 ]
+    then
+      n=$((WGblock+4))
+      sed -i "${n}i min_clusters_per_file = ~{minClusterPerFileWG} " mavis_config.cfg
+    fi
+    ################
+    
+    
+    
 
     export MAVIS_ALIGNER='~{mavisAligner}'
     export MAVIS_SCHEDULER=~{mavisScheduler}
@@ -320,10 +351,12 @@ task runMavis {
     export MAVIS_TRANS_VALIDATION_MEMORY=~{mavisTransValidationMemory}
     export MAVIS_MEMORY_LIMIT=~{mavisMemoryLimit}
     export DRAW_NON_SYNONYMOUS_CDNA_ONLY=~{drawNonSynonymousCdnaOnly}
-    export min_clusters_per_file=~{minClusterPerFile}
     export MAVIS_UNINFORMATIVE_FILTER=~{mavisUninformativeFilter}
     export MAVIS_QUEUE=~{mavisQueue}
     mavis setup ~{outputCONFIG} -o .
+    
+    
+    
     BATCHID=$(grep MS_batch build.cfg | grep -v \] | sed s/.*-// | tail -n 1)
     mavis schedule -o . --submit 2> >(tee launch_stderr.log)
     sleep ~{sleepInterval}
