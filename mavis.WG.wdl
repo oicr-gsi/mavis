@@ -182,6 +182,8 @@ workflow mavis {
     File drawings = bundle_drawings.drawings
     ### File? nscvWT   = summarize.nscvWT
     File? nscvWG   = summarize.nscvWG
+    ### File? clustersWT   = setupMavis.clustersWT
+    File? clustersWG   = setupMavis.clustersWG
   }
 }
 
@@ -545,7 +547,8 @@ task setupMavis {
     Int mavisTransValidationMemory = 32000
     Int mavisMemoryLimit = 32000
     String mavisQueue = "u20.q"
-    Int minClusterPerFile = 10
+    Int minClusterPerFileWG = 10
+    #Int minClusterPerFileWT = 10
     String drawNonSynonymousCdnaOnly = "False"
     String mavisUninformativeFilter = "True"
     String modules
@@ -582,7 +585,8 @@ task setupMavis {
     mavisTransValidationMemory: "Memory allocated for transvalidation step"
     mavisMemoryLimit: "Max Memory allocated for MAVIS"
     mavisQueue: "the mavis job queue"
-    minClusterPerFile: "Determines the way parallel calculations are organized "
+    minClusterPerFileWG: "Determines the way parallel calculations are organized "
+    # minClusterPerFileWT: "Determines the way parallel calculations are organized "
     drawNonSynonymousCdnaOnly: "flag for MAVIS visualization control"
     mavisUninformativeFilter: "Should be enabled if used is only interested in events inside genes, speeds up calculations"
     modules: "modules needed to run MAVIS"
@@ -661,10 +665,34 @@ task setupMavis {
     ./~{scriptName} &
     wait
     
+    ##################
+    ## post setup adjustment to handle a failure, not sure why this was needed
+    ## it adjusts the bins value then tries to run it again
     if [ ! -f ~{outputCONFIG} ]; then
       sed -i 's/_bins 500/_bins ~{maxBins}/' ~{scriptName}
       ./~{scriptName}
     fi
+    ################
+
+    ##################
+    ## post setup adjustment to inject the cluster size into the cfg file
+    ## it is not possible to do this with mavis setup
+    cp mavis_config.cfg mavis_config.cfg.original
+
+    ### WTblock=`grep -n "\[WT" mavis_config.cfg | cut -d: -f1`
+    ### if [ $WTblock>0 ]
+    ### then
+    ###  n=$((WTblock+4))
+    ###  sed -i "${n}i min_clusters_per_file = ~{minClusterPerFileWT} " mavis_config.cfg
+    ### fi
+
+    WGblock=`grep -n "\[WG" mavis_config.cfg | cut -d: -f1`
+    if [ $WGblock>0 ]
+    then
+      n=$((WGblock+4))
+      sed -i "${n}i min_clusters_per_file = ~{minClusterPerFileWG} " mavis_config.cfg
+    fi
+    ################
 
     export MAVIS_ALIGNER='~{mavisAligner}'
     export MAVIS_SCHEDULER=~{mavisScheduler}
@@ -684,6 +712,14 @@ task setupMavis {
     ### echo $WT_dir > WT_directory.txt
     echo $WG_dir > WG_directory.txt
     
+    ### cluster_assignment files are useful to understand how the input variants are tracked
+    if [ -e WG*/cluster/cluster_assignment.tab ];then
+      cp WG*/cluster/cluster_assignment.tab ~{prefix}.WG_cluster_assigment.tab
+    fi
+    ### if [ -e WT*/cluster/cluster_assignment.tab ];then
+    ###  cp WT*/cluster/cluster_assignment.tab ~{prefix}.WT_cluster_assigment.tab
+    ### fi
+    
   >>>
 
   runtime {
@@ -701,6 +737,8 @@ task setupMavis {
     File WG_anno = read_string("WG_directory.txt") + "/annotate/submit.sh"
     File pairing = "pairing/submit.sh"
     File summary = "summary/submit.sh"
+    ### File clustersWT   = "~{prefix}.WT_cluster_assigment.tab"
+    File clustersWG   = "~{prefix}.WG_cluster_assigment.tab"
   }
 }
 
