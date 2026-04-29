@@ -703,7 +703,6 @@ task setupMavis {
     export MAVIS_TRANS_VALIDATION_MEMORY=~{mavisTransValidationMemory}
     export MAVIS_MEMORY_LIMIT=~{mavisMemoryLimit}
     export DRAW_NON_SYNONYMOUS_CDNA_ONLY=~{drawNonSynonymousCdnaOnly}
-    export min_clusters_per_file=~{minClusterPerFile}
     export MAVIS_UNINFORMATIVE_FILTER=~{mavisUninformativeFilter}
     export MAVIS_QUEUE=~{mavisQueue}
     mavis setup ~{outputCONFIG} -o .
