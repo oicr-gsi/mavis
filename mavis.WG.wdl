@@ -380,7 +380,12 @@ task bundle_drawings {
      ### -j will remove directories, and only zip files
      zip -j ~{prefix}.mavis_drawings.zip ~{sep=' ' drawings}
   >>>
-  
+ 
+   runtime {
+    memory:  "~{jobMemory} GB"
+    timeout: "~{timeout}"
+  }
+ 
   output {
     File drawings = "~{prefix}.mavis_drawings.zip"
   }
