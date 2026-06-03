@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.4.1] - 2026-06-03
+### Changed
+- [GRD-1175](https://jira.oicr.on.ca/browse/GRD-1175) changed hg38noAlt to hg38_noAlt for consistency
+
+## [3.4.0] - 2026-02-06
+### Changed
+- [GRD-1019](https://jira.oicr.on.ca/browse/GRD-1019)
+- Updated genomes to include hg38_noAlt
+
+## [3.3.2] - 2025-06-13
+### Fixed
+- Fixed an issue where the file paths were not updated correctly due to a missing update during deployment 3.3.0.
+
 ## [3.3.2] - 2025-06-13
 ### Fixed
 - Fixed an issue where the file paths were not updated correctly due to a missing update during deployment 3.3.0.
