@@ -5,14 +5,14 @@ workflow mavis {
     String sampleId
     Array[BamData] inputBAMs
     Array[SvData] svData
-	String reference
+        String reference
   }
 
   parameter_meta {
     sampleId: "sample identifier, which will be used for final naming of output files"
     inputBAMs: "Collection of alignment files with indexes and metadata"
     svData: "Collection of SV calls with metadata"
-	reference: "The genome reference build. for example: hg19, hg38"
+        reference: "The genome reference build. for example: hg19, hg38"
   }
   
   
@@ -243,7 +243,7 @@ task summarize {
   }
   
   command <<<
-     python <<CODE
+     python3 <<CODE
      
      import os
      os.mkdir("summary_output")
@@ -322,7 +322,7 @@ task pairing {
   }
   
   command <<<
-     python <<CODE
+     python3 <<CODE
      
      import os
      os.mkdir("pairing_output")
@@ -378,7 +378,13 @@ task bundle_drawings {
 
   command <<<
      ### -j will remove directories, and only zip files
-     zip -j ~{prefix}.mavis_drawings.zip ~{sep=' ' drawings}
+     python3 -c "
+import zipfile, os
+drawings = '~{sep="' '" drawings}'.split()
+with zipfile.ZipFile('~{prefix}.mavis_drawings.zip', 'w') as z:
+    for f in drawings:
+        z.write(f, os.path.basename(f))
+"
   >>>
  
    runtime {
@@ -411,7 +417,7 @@ task annotate {
   }
   
   command <<<
-     python <<CODE
+     python3 <<CODE
      
      import os
      os.mkdir("annotation_output")
@@ -477,7 +483,7 @@ task validate {
   }
   
   command <<<
-     python <<CODE
+     python3 <<CODE
      
      import os
      os.mkdir("validation_output")
@@ -545,7 +551,7 @@ task setupMavis {
     String alignerReference
     String templateMetadata
     String mavisAligner = "blat"
-    String mavisScheduler = "SGE"
+    String mavisScheduler = "SLURM"
     String mavisDrawFusionOnly = "False"
     Int mavisAnnotationMemory = 32000
     Int mavisValidationMemory = 32000
@@ -666,8 +672,7 @@ task setupMavis {
     f.close()
     CODE
     
-    chmod +x ~{scriptName}
-    ./~{scriptName} &
+    bash mavis_config.sh &
     wait
     
     ##################
@@ -716,6 +721,8 @@ task setupMavis {
     ### if [ -e WT*/cluster/cluster_assignment.tab ];then
     ###  cp WT*/cluster/cluster_assignment.tab ~{prefix}.WT_cluster_assigment.tab
     ### fi
+
+    find . -path "./WG.*/cluster/batch*tab" > wg_batches.txt
     
   >>>
 
@@ -727,7 +734,7 @@ task setupMavis {
 
   output {
     ### Array[File] WT_batches = glob("WT.*/cluster/batch*tab")
-    Array[File] WG_batches = glob("WG.*/cluster/batch*tab")
+    Array[File] WG_batches = read_lines("wg_batches.txt")
     ### File WT_val = read_string("WT_directory.txt") + "/validate/submit.sh"
     File WG_val = read_string("WG_directory.txt") + "/validate/submit.sh"
     ### File WT_anno = read_string("WT_directory.txt") + "/annotate/submit.sh"
@@ -751,5 +758,3 @@ struct SvData {
   String libraryDesign
   Boolean? doFilter
 }
-
-
